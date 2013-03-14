@@ -109,6 +109,17 @@ const u8 HOTKEY_UP_DISPLAY[] = {0xE2, 0x86, 0x91, 0x00};
 const u8 HOTKEY_RIGHT_DISPLAY[] = {0xE2, 0x86, 0x92, 0x00};
 const u8 HOTKEY_DOWN_DISPLAY[] = {0xE2, 0x86, 0x93, 0x00};
 
+#define POKEMON_ROM_NUM 7
+const u8 POKEMON_ROM_CODES[7][3] = {
+   {'B', 'P', 'E'} /* Emerald */,
+   {'B', 'P', 'R'} /* FireRed */,
+   {'B', 'P', 'G'} /* LeafGreen */,
+   {'B', '2', '4'} /* Red Rescue Team */,
+   {'A', 'X', 'P'} /* Sapphire */,
+   {'A', 'X', 'V'} /* Ruby */,
+   {'B', 'P', 'P'} /* Pinball Ruby & Sapphire */
+};
+
 #ifdef TEST_MODE
 #define VER_RELEASE "test"
 #else
@@ -1686,6 +1697,25 @@ u32 menu(u16 *screen, int FirstInvocation)
     {
       reset_gba();
       reg[CHANGED_PC_STATUS] = 1;
+
+      int i;
+      u8 found = 0;
+      for (i = 0; i < POKEMON_ROM_NUM; i++) {
+        if (memcmp(gamepak_code, POKEMON_ROM_CODES[i], 3) == 0) {
+          found = 1;
+          break;
+        }
+      }
+
+      if (found == 0) {
+        draw_message(down_screen_addr, bg_screenp, 28, 31, 227, 165, bg_screenp_color);
+        draw_string_vcenter(down_screen_addr, MESSAGE_BOX_TEXT_X, MESSAGE_BOX_TEXT_Y, MESSAGE_BOX_TEXT_SX, COLOR_MSSG, "Warning: PokéGBA is optimised for Pokémon games. You may experience glitches in the game you just loaded.\n\nPress \xD7\x88 to dismiss this message.");
+        ds2_flipScreen(DOWN_SCREEN, DOWN_SCREEN_UPDATE_METHOD);
+        struct key_buf inputdata;
+        do {
+          ds2_getrawInput(&inputdata);
+        } while (!(inputdata.key & KEY_A));
+      }
     }
 
     first_load = 0;
