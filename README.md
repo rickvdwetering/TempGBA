@@ -1,4 +1,4 @@
-TempGBA alpha version (that means it may or may not work)
+TempGBA alpha version 1 (that means it may or may not work)
 
 A Game Boy Advance emulator for the Supercard DSTWO.
 
@@ -13,13 +13,25 @@ Based on:
 (If you got the source code and want to compile it, see the `Compiling` section
  at the end of the file.)
 
-- - - - CUT HERE - - - - (Section invalid for now as there is no .plg release)
+To install the plugin to your storage card, copy `tempgba.plg`, `tempgba.ini`
+and `tempgba.bmp` from the release archive to the card's `_dstwoplug`
+directory. Then, copy the `TEMPGBA` subdirectory to the root of the card.
 
-To install the plugin to your storage card, copy `catsfc.plg`, `catsfc.ini` and
-`catsfc.bmp` from the release archive to the card's `_dstwoplug` directory.
-Then, copy the `CATSFC` subdirectory to the root of the card.
+# Improving game compatibility with game_config.txt
 
-- - - - CUT HERE - - - -
+Included with this release is a file called game_config.txt. The file is the
+same as the one included in gpSP Kai. It goes in the `TEMPGBA` directory on
+your storage card when you extract the release.
+
+This file contains information to enhance game compatibility in two ways.
+* Firstly, it tells TempGBA about the save type used by a certain game, so that
+  battery-backed saves may be read and written correctly.
+* Secondly, it tells TempGBA about idle loops in a certain game, so that it may
+  stop emulating when the game reaches them. It runs the game faster.
+
+game_config.txt receives updates from the community occasionally.
+For the latest version, see:
+<http://filetrip.net/nds-downloads/flashcart-files/latest-x-f12630.html>
 
 # Cheats
 
