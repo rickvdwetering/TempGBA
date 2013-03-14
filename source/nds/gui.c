@@ -4363,7 +4363,7 @@ int gui_init(u32 lang_id)
 
 	HighFrequencyCPU(); // Crank it up. When the menu starts, -> 0.
 
-    //Find the "TEMPGBA" system directory
+    //Find the "POKEGBA" system directory
     DIR *current_dir;
 
     if(CheckLoad_Arg()){
@@ -4374,19 +4374,19 @@ int gui_init(u32 lang_id)
       char *endStr = strrchr(main_path, '/');
       *endStr = '\0';
 
-      //do a check to make sure the folder is a valid TempGBA folder
+      //do a check to make sure the folder is a valid PokéGBA folder
       char tempPath[MAX_PATH];
       strcpy(tempPath, main_path);
       strcat(tempPath, "/system/gui");
       DIR *testDir = opendir(tempPath);
       if(!testDir)
-        //not a valid TempGBA install
-        strcpy(main_path, "fat:/TEMPGBA");
+        //not a valid PokéGBA install
+        strcpy(main_path, "fat:/POKEGBA");
       else//test was successful, do nothing
         closedir(testDir);
     }
     else
-      strcpy(main_path, "fat:/TEMPGBA");
+      strcpy(main_path, "fat:/POKEGBA");
 
 
 
@@ -4395,20 +4395,20 @@ int gui_init(u32 lang_id)
         closedir(current_dir);
     else
     {
-        strcpy(main_path, "fat:/_SYSTEM/PLUGINS/TEMPGBA");
+        strcpy(main_path, "fat:/_SYSTEM/PLUGINS/POKEGBA");
         current_dir = opendir(main_path);
         if(current_dir)
             closedir(current_dir);
         else
         {
             strcpy(main_path, "fat:");
-            if(search_dir("TEMPGBA", main_path) == 0)
+            if(search_dir("POKEGBA", main_path) == 0)
             {
-                printf("Found TEMPGBA directory\r\nDossier TEMPGBA trouve\r\n\r\n%s\r\n", main_path);
+                printf("Found POKEGBA directory\r\nDossier POKEGBA trouve\r\n\r\n%s\r\n", main_path);
             }
             else
             {
-				err_msg(DOWN_SCREEN, "/TEMPGBA: Directory missing\r\nPress any key to return to\r\nthe menu\r\n\r\n/TEMPGBA: Dossier manquant\r\nAppuyer sur une touche pour\r\nretourner au menu");
+				err_msg(DOWN_SCREEN, "/POKEGBA: Directory missing\r\nPress any key to return to\r\nthe menu\r\n\r\n/POKEGBA: Dossier manquant\r\nAppuyer sur une touche pour\r\nretourner au menu");
                 goto gui_init_err;
             }
         }

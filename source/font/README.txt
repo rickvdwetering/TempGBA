@@ -1,5 +1,5 @@
 In this directory, you will find the source file for the main font used by
-TempGBA. It's an Adobe BDF file, which is fed into the emulator when running
+PokéGBA. It's an Adobe BDF file, which is fed into the emulator when running
 in "font dump" mode to produce a more efficient representation in an "ODF"
 format. The font is based on the one used by Pictochat, with a few more
 characters that Pictochat does not have (but no Japanese characters).
@@ -9,7 +9,7 @@ FontForge. Open the font in the application then export it again as BDF.
 One case where you would want to do this is to add new glyphs to support a
 new language.
 
-To include the more efficient representation (ODF) in TEMPGBA/system after
+To include the more efficient representation (ODF) in POKEGBA/system after
 editing the BDF file:
 
  1. If your font added characters beyond U+2193 DOWNWARDS ARROW, adjust the
@@ -22,7 +22,7 @@ editing the BDF file:
     This will make the plugin read the BDF source and write an ODF file.
  3. make
  4. Copy the new plugin to your card, under /_dstwoplug.
- 5. Copy the .bdf file to your card, under /TEMPGBA/system, as
+ 5. Copy the .bdf file to your card, under /POKEGBA/system, as
     Pictochat-16.bdf.
  6. Run the plugin on the Supercard DSTWO. It will briefly load, then display
     "Font library initialisation error -1, press any key to exit". This is
