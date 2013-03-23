@@ -62,8 +62,8 @@ Fast-forward     %s
 Frame skipping    %s
 #FMT_AUDIO_SOUND
 Sound                  %s
-#FMT_AUDIO_RETRO_SOUND
-Retro sound       %s
+#FMT_VIDEO_REWINDING
+Rewinding       %s
 #FMT_SAVED_STATE_CREATE
 Create saved state      %d
 #FMT_SAVED_STATE_LOAD
@@ -80,6 +80,10 @@ Screenshots...
 Global hotkeys...
 #MSG_TOOLS_GAME_HOTKEY_GENERAL
 Game-specific hotkey overrides...
+#MSG_TOOLS_GLOBAL_BUTTON_MAPPING_GENERAL
+Global button mappings...
+#MSG_TOOLS_GAME_BUTTON_MAPPING_GENERAL
+Game-specific button mappings...
 #FMT_OPTIONS_LANGUAGE
 Language                          %s
 #FMT_OPTIONS_CPU_FREQUENCY
@@ -106,6 +110,8 @@ Version information
 Save a screenshot
 #MSG_SCREENSHOT_BROWSE
 Screenshot slideshow
+#MSG_HOTKEY_REWIND
+Rewind
 #MSG_HOTKEY_MAIN_MENU
 Go to main menu
 #MSG_HOTKEY_TEMPORARY_FAST_FORWARD
@@ -118,8 +124,30 @@ Load saved state 1
 Create saved state 1
 #MSG_HOTKEY_FULL_SCREEN_TOGGLE
 Toggle full-screen
+#MSG_BUTTON_MAPPING_A
+GBA key *A
+#MSG_BUTTON_MAPPING_B
+GBA key *B
+#MSG_BUTTON_MAPPING_SELECT
+GBA key *s
+#MSG_BUTTON_MAPPING_START
+GBA key *S
+#MSG_BUTTON_MAPPING_R
+GBA key *R
+#MSG_BUTTON_MAPPING_L
+GBA key *L
+#MSG_BUTTON_MAPPING_RAPID_A
+Rapid-fire *A
+#MSG_BUTTON_MAPPING_RAPID_B
+Rapid-fire *B
 #MSG_PROGRESS_HOTKEY_WAITING_FOR_KEYS
 Press the buttons you wish to use to perform this action.
+#MSG_PROGRESS_MAPPING_WAITING_FOR_KEY
+Press the DS button you wish to map to this GBA button.
+#MSG_PROGRESS_MAPPING_WAITING_FOR_KEY_OR_CLEAR
+Press the DS button you wish to map to this GBA button.\n
+\n
+You can press two buttons at once to delete this mapping.
 #MSG_HOTKEY_DELETE_WITH_A
 *A Clear
 #MSG_HOTKEY_CANCEL_WITH_B
@@ -164,6 +192,20 @@ New game
 [9] Show 1 in 10 frames
 #MSG_VIDEO_FRAME_SKIPPING_10
 [10] Show 1 in 11 frames
+#MSG_VIDEO_REWINDING_0
+Disabled
+#MSG_VIDEO_REWINDING_1
+0.25 s (3.5 s total)
+#MSG_VIDEO_REWINDING_2
+0.5 s (7 s total)
+#MSG_VIDEO_REWINDING_3
+1 s (14 s total)
+#MSG_VIDEO_REWINDING_4
+2 s (28 s total)
+#MSG_VIDEO_REWINDING_5
+5 s (1:10 mn total)
+#MSG_VIDEO_REWINDING_6
+10 s (2:20 mn total)
 #MSG_GENERAL_OFF
 Off
 #MSG_GENERAL_ON
@@ -275,8 +317,8 @@ STARTCHINESESIM
 跳帧方式                 %s
 #FMT_AUDIO_SOUND
 声音开关                 %s
-#FMT_AUDIO_RETRO_SOUND
-Retro sound             %s
+#FMT_VIDEO_REWINDING
+Rewinding       %s
 #FMT_SAVED_STATE_CREATE
 写入存档                 %d
 #FMT_SAVED_STATE_LOAD
@@ -293,6 +335,10 @@ Retro sound             %s
 全局热键
 #MSG_TOOLS_GAME_HOTKEY_GENERAL
 游戏专用覆盖性热键
+#MSG_TOOLS_GLOBAL_BUTTON_MAPPING_GENERAL
+Global button mappings...
+#MSG_TOOLS_GAME_BUTTON_MAPPING_GENERAL
+Game-specific button mappings...
 #FMT_OPTIONS_LANGUAGE
 语言                               %s
 #FMT_OPTIONS_CPU_FREQUENCY
@@ -319,6 +365,8 @@ CPU主频                          %s
 保存屏幕快照
 #MSG_SCREENSHOT_BROWSE
 浏览屏幕快照
+#MSG_HOTKEY_REWIND
+Rewind
 #MSG_HOTKEY_MAIN_MENU
 返回主菜单
 #MSG_HOTKEY_TEMPORARY_FAST_FORWARD
@@ -331,8 +379,30 @@ CPU主频                          %s
 保存即时存档 1
 #MSG_HOTKEY_FULL_SCREEN_TOGGLE
 全屏开关
+#MSG_BUTTON_MAPPING_A
+GBA key *A
+#MSG_BUTTON_MAPPING_B
+GBA key *B
+#MSG_BUTTON_MAPPING_SELECT
+GBA key *s
+#MSG_BUTTON_MAPPING_START
+GBA key *S
+#MSG_BUTTON_MAPPING_R
+GBA key *R
+#MSG_BUTTON_MAPPING_L
+GBA key *L
+#MSG_BUTTON_MAPPING_RAPID_A
+Rapid-fire *A
+#MSG_BUTTON_MAPPING_RAPID_B
+Rapid-fire *B
 #MSG_PROGRESS_HOTKEY_WAITING_FOR_KEYS
 按下你想要设置为这个效果的按钮
+#MSG_PROGRESS_MAPPING_WAITING_FOR_KEY
+Press the DS button you wish to map to this GBA button.
+#MSG_PROGRESS_MAPPING_WAITING_FOR_KEY_OR_CLEAR
+Press the DS button you wish to map to this GBA button.\n
+\n
+You can press two buttons at once to delete this mapping.
 #MSG_HOTKEY_DELETE_WITH_A
 *A 清除
 #MSG_HOTKEY_CANCEL_WITH_B
@@ -377,6 +447,20 @@ CPU主频                          %s
 [9] 显示 1/10
 #MSG_VIDEO_FRAME_SKIPPING_10
 [10] 显示 1/11
+#MSG_VIDEO_REWINDING_0
+Disabled
+#MSG_VIDEO_REWINDING_1
+0.25 s (3.5 s total)
+#MSG_VIDEO_REWINDING_2
+0.5 s (7 s total)
+#MSG_VIDEO_REWINDING_3
+1 s (14 s total)
+#MSG_VIDEO_REWINDING_4
+2 s (28 s total)
+#MSG_VIDEO_REWINDING_5
+5 s (1:10 mn total)
+#MSG_VIDEO_REWINDING_6
+10 s (2:20 mn total)
 #MSG_GENERAL_OFF
 关
 #MSG_GENERAL_ON
@@ -488,8 +572,8 @@ Avance rapide       %s
 Omission d'images  %s
 #FMT_AUDIO_SOUND
 Son                         %s
-#FMT_AUDIO_RETRO_SOUND
-Son rétro               %s
+#FMT_VIDEO_REWINDING
+Rembobinage       %s
 #FMT_SAVED_STATE_CREATE
 Créer la sauvegarde       %d
 #FMT_SAVED_STATE_LOAD
@@ -505,7 +589,11 @@ Captures d'écran...
 #MSG_TOOLS_GLOBAL_HOTKEY_GENERAL
 Raccourcis globaux...
 #MSG_TOOLS_GAME_HOTKEY_GENERAL
-Raccourcis pour le jeu actuel...
+Raccourcis pour ce jeu...
+#MSG_TOOLS_GLOBAL_BUTTON_MAPPING_GENERAL
+Affectations de boutons globales...
+#MSG_TOOLS_GAME_BUTTON_MAPPING_GENERAL
+Affectations de boutous pour ce jeu...
 #FMT_OPTIONS_LANGUAGE
 Langue                              %s
 #FMT_OPTIONS_CPU_FREQUENCY
@@ -532,6 +620,8 @@ Version
 Créer une capture d'écran
 #MSG_SCREENSHOT_BROWSE
 Diaporama de captures d'écran
+#MSG_HOTKEY_REWIND
+Rembobiner
 #MSG_HOTKEY_MAIN_MENU
 Menu principal
 #MSG_HOTKEY_TEMPORARY_FAST_FORWARD
@@ -544,8 +634,30 @@ Charger la sauvegarde 1
 Créer la sauvegarde 1
 #MSG_HOTKEY_FULL_SCREEN_TOGGLE
 (Dés)activer le plein écran
+#MSG_BUTTON_MAPPING_A
+Touche GBA *A
+#MSG_BUTTON_MAPPING_B
+Touche GBA *B
+#MSG_BUTTON_MAPPING_SELECT
+Touche GBA *s
+#MSG_BUTTON_MAPPING_START
+Touche GBA *S
+#MSG_BUTTON_MAPPING_R
+Touche GBA *R
+#MSG_BUTTON_MAPPING_L
+Touche GBA *L
+#MSG_BUTTON_MAPPING_RAPID_A
+Tir rapide *A
+#MSG_BUTTON_MAPPING_RAPID_B
+Tir rapide *B
 #MSG_PROGRESS_HOTKEY_WAITING_FOR_KEYS
 Appuyez sur les boutons que vous voulez utiliser pour effectuer cette action.
+#MSG_PROGRESS_MAPPING_WAITING_FOR_KEY
+Appuyez sur le bouton DS que vous voulez affecter à ce bouton GBA.
+#MSG_PROGRESS_MAPPING_WAITING_FOR_KEY_OR_CLEAR
+Appuyez sur le bouton DS que vous voulez affecter à ce bouton GBA.\n
+\n
+Vous pouvez appuyer sur deux boutons à la fois pour supprimer cette affectation.
 #MSG_HOTKEY_DELETE_WITH_A
 *A Effacer
 #MSG_HOTKEY_CANCEL_WITH_B
@@ -590,6 +702,20 @@ Nouveau jeu
 [9] Montrer 1 image sur 10
 #MSG_VIDEO_FRAME_SKIPPING_10
 [10] Montrer 1 image sur 11
+#MSG_VIDEO_REWINDING_0
+Hors fonction
+#MSG_VIDEO_REWINDING_1
+0.25 s (3.5 s au total)
+#MSG_VIDEO_REWINDING_2
+0.5 s (7 s au total)
+#MSG_VIDEO_REWINDING_3
+1 s (14 s au total)
+#MSG_VIDEO_REWINDING_4
+2 s (28 s au total)
+#MSG_VIDEO_REWINDING_5
+5 s (1:10 mn au total)
+#MSG_VIDEO_REWINDING_6
+10 s (2:20 mn au total)
 #MSG_GENERAL_OFF
 Hors fonction
 #MSG_GENERAL_ON
@@ -702,8 +828,8 @@ Schnellvorlauf   %s
 Frames übersp.  %s
 #FMT_AUDIO_SOUND
 Ton                     %s
-#FMT_AUDIO_RETRO_SOUND
-Retro-Ton          %s
+#FMT_VIDEO_REWINDING
+Rewinding       %s
 #FMT_SAVED_STATE_CREATE
 Speicherstand erstellen      %d
 #FMT_SAVED_STATE_LOAD
@@ -720,6 +846,10 @@ Screenshots...
 Globale Hotkeys...
 #MSG_TOOLS_GAME_HOTKEY_GENERAL
 Spielspezifische Hotkeys...
+#MSG_TOOLS_GLOBAL_BUTTON_MAPPING_GENERAL
+Global button mappings...
+#MSG_TOOLS_GAME_BUTTON_MAPPING_GENERAL
+Game-specific button mappings...
 #FMT_OPTIONS_LANGUAGE
 Sprache                          %s
 #FMT_OPTIONS_CPU_FREQUENCY
@@ -746,6 +876,8 @@ Versionsinformation
 Screenshot speichern
 #MSG_SCREENSHOT_BROWSE
 Screenshots durchsuchen
+#MSG_HOTKEY_REWIND
+Rewind
 #MSG_HOTKEY_MAIN_MENU
 Hauptmenü
 #MSG_HOTKEY_TEMPORARY_FAST_FORWARD
@@ -758,8 +890,30 @@ Speicherstand 1 laden
 Speicherstand 1 erstellen
 #MSG_HOTKEY_FULL_SCREEN_TOGGLE
 Vollbild umschalten
+#MSG_BUTTON_MAPPING_A
+GBA key *A
+#MSG_BUTTON_MAPPING_B
+GBA key *B
+#MSG_BUTTON_MAPPING_SELECT
+GBA key *s
+#MSG_BUTTON_MAPPING_START
+GBA key *S
+#MSG_BUTTON_MAPPING_R
+GBA key *R
+#MSG_BUTTON_MAPPING_L
+GBA key *L
+#MSG_BUTTON_MAPPING_RAPID_A
+Rapid-fire *A
+#MSG_BUTTON_MAPPING_RAPID_B
+Rapid-fire *B
 #MSG_PROGRESS_HOTKEY_WAITING_FOR_KEYS
 Knöpfe für dieses Ereignis drücken.
+#MSG_PROGRESS_MAPPING_WAITING_FOR_KEY
+Press the DS button you wish to map to this GBA button.
+#MSG_PROGRESS_MAPPING_WAITING_FOR_KEY_OR_CLEAR
+Press the DS button you wish to map to this GBA button.\n
+\n
+You can press two buttons at once to delete this mapping.
 #MSG_HOTKEY_DELETE_WITH_A
 *A Löschen
 #MSG_HOTKEY_CANCEL_WITH_B
@@ -804,6 +958,20 @@ Neues Spiel
 [9] Zeige 1 von 10 Frames
 #MSG_VIDEO_FRAME_SKIPPING_10
 [10] Zeige 1 von 11 Frames
+#MSG_VIDEO_REWINDING_0
+Disabled
+#MSG_VIDEO_REWINDING_1
+0.25 s (3.5 s total)
+#MSG_VIDEO_REWINDING_2
+0.5 s (7 s total)
+#MSG_VIDEO_REWINDING_3
+1 s (14 s total)
+#MSG_VIDEO_REWINDING_4
+2 s (28 s total)
+#MSG_VIDEO_REWINDING_5
+5 s (1:10 mn total)
+#MSG_VIDEO_REWINDING_6
+10 s (2:20 mn total)
 #MSG_GENERAL_OFF
 Aus
 #MSG_GENERAL_ON
@@ -916,8 +1084,8 @@ Vooruitspoelen     %s
 Beeld overslaan   %s
 #FMT_AUDIO_SOUND
 Geluid                    %s
-#FMT_AUDIO_RETRO_SOUND
-Retro geluid         %s
+#FMT_VIDEO_REWINDING
+Rewinding       %s
 #FMT_SAVED_STATE_CREATE
 Creëer spelstaat       %d
 #FMT_SAVED_STATE_LOAD
@@ -934,6 +1102,10 @@ Beeldschermafdrukken...
 Globale sneltoetsen...
 #MSG_TOOLS_GAME_HOTKEY_GENERAL
 Spel-specifieke sneltoetsen...
+#MSG_TOOLS_GLOBAL_BUTTON_MAPPING_GENERAL
+Global button mappings...
+#MSG_TOOLS_GAME_BUTTON_MAPPING_GENERAL
+Game-specific button mappings...
 #FMT_OPTIONS_LANGUAGE
 Taal                                  %s
 #FMT_OPTIONS_CPU_FREQUENCY
@@ -960,6 +1132,8 @@ Versie-informatie
 Maak beeldschermafdruk
 #MSG_SCREENSHOT_BROWSE
 Diavoorstelling
+#MSG_HOTKEY_REWIND
+Rewind
 #MSG_HOTKEY_MAIN_MENU
 Ga naar het hoofdmenu
 #MSG_HOTKEY_TEMPORARY_FAST_FORWARD
@@ -972,8 +1146,30 @@ Laad spelstaat 1
 Sla spelstaat 1 op
 #MSG_HOTKEY_FULL_SCREEN_TOGGLE
 Schakel naar volledig scherm
+#MSG_BUTTON_MAPPING_A
+GBA key *A
+#MSG_BUTTON_MAPPING_B
+GBA key *B
+#MSG_BUTTON_MAPPING_SELECT
+GBA key *s
+#MSG_BUTTON_MAPPING_START
+GBA key *S
+#MSG_BUTTON_MAPPING_R
+GBA key *R
+#MSG_BUTTON_MAPPING_L
+GBA key *L
+#MSG_BUTTON_MAPPING_RAPID_A
+Rapid-fire *A
+#MSG_BUTTON_MAPPING_RAPID_B
+Rapid-fire *B
 #MSG_PROGRESS_HOTKEY_WAITING_FOR_KEYS
 Druk op de gewenste knoppencombinatie.
+#MSG_PROGRESS_MAPPING_WAITING_FOR_KEY
+Press the DS button you wish to map to this GBA button.
+#MSG_PROGRESS_MAPPING_WAITING_FOR_KEY_OR_CLEAR
+Press the DS button you wish to map to this GBA button.\n
+\n
+You can press two buttons at once to delete this mapping.
 #MSG_HOTKEY_DELETE_WITH_A
 *A Wissen
 #MSG_HOTKEY_CANCEL_WITH_B
@@ -1018,6 +1214,20 @@ Nieuw spel
 [9] 1 uit 10 beelden tonen
 #MSG_VIDEO_FRAME_SKIPPING_10
 [10] 1 uit 11 beelden tonen
+#MSG_VIDEO_REWINDING_0
+Disabled
+#MSG_VIDEO_REWINDING_1
+0.25 s (3.5 s total)
+#MSG_VIDEO_REWINDING_2
+0.5 s (7 s total)
+#MSG_VIDEO_REWINDING_3
+1 s (14 s total)
+#MSG_VIDEO_REWINDING_4
+2 s (28 s total)
+#MSG_VIDEO_REWINDING_5
+5 s (1:10 mn total)
+#MSG_VIDEO_REWINDING_6
+10 s (2:20 mn total)
 #MSG_GENERAL_OFF
 Uit
 #MSG_GENERAL_ON
@@ -1130,8 +1340,8 @@ Modo avance rápido   %s
 Salto de fotogramas  %s
 #FMT_AUDIO_SOUND
 Sonido                         %s
-#FMT_AUDIO_RETRO_SOUND
-Sonido retro               %s
+#FMT_VIDEO_REWINDING
+Rewinding       %s
 #FMT_SAVED_STATE_CREATE
 Grabar partida  %d
 #FMT_SAVED_STATE_LOAD
@@ -1148,6 +1358,10 @@ Capturas de pantalla...
 Teclas de atajo globales...
 #MSG_TOOLS_GAME_HOTKEY_GENERAL
 Teclas de atajo en juego...
+#MSG_TOOLS_GLOBAL_BUTTON_MAPPING_GENERAL
+Global button mappings...
+#MSG_TOOLS_GAME_BUTTON_MAPPING_GENERAL
+Game-specific button mappings...
 #FMT_OPTIONS_LANGUAGE
 Idioma                                %s
 #FMT_OPTIONS_CPU_FREQUENCY
@@ -1174,6 +1388,8 @@ Información de versión
 Salvar captura
 #MSG_SCREENSHOT_BROWSE
 Mostrar capturas
+#MSG_HOTKEY_REWIND
+Rewind
 #MSG_HOTKEY_MAIN_MENU
 Ir al menú principal
 #MSG_HOTKEY_TEMPORARY_FAST_FORWARD
@@ -1186,8 +1402,30 @@ Cargar partida 1
 Grabar partida 1
 #MSG_HOTKEY_FULL_SCREEN_TOGGLE
 Alternar pantalla completa
+#MSG_BUTTON_MAPPING_A
+GBA key *A
+#MSG_BUTTON_MAPPING_B
+GBA key *B
+#MSG_BUTTON_MAPPING_SELECT
+GBA key *s
+#MSG_BUTTON_MAPPING_START
+GBA key *S
+#MSG_BUTTON_MAPPING_R
+GBA key *R
+#MSG_BUTTON_MAPPING_L
+GBA key *L
+#MSG_BUTTON_MAPPING_RAPID_A
+Rapid-fire *A
+#MSG_BUTTON_MAPPING_RAPID_B
+Rapid-fire *B
 #MSG_PROGRESS_HOTKEY_WAITING_FOR_KEYS
 Presione la tecla para esta acción.
+#MSG_PROGRESS_MAPPING_WAITING_FOR_KEY
+Press the DS button you wish to map to this GBA button.
+#MSG_PROGRESS_MAPPING_WAITING_FOR_KEY_OR_CLEAR
+Press the DS button you wish to map to this GBA button.\n
+\n
+You can press two buttons at once to delete this mapping.
 #MSG_HOTKEY_DELETE_WITH_A
 *A Borrar
 #MSG_HOTKEY_CANCEL_WITH_B
@@ -1232,6 +1470,20 @@ Nuevo juego
 [9] Mostrar 1/10
 #MSG_VIDEO_FRAME_SKIPPING_10
 [10] Mostrar 1/11
+#MSG_VIDEO_REWINDING_0
+Disabled
+#MSG_VIDEO_REWINDING_1
+0.25 s (3.5 s total)
+#MSG_VIDEO_REWINDING_2
+0.5 s (7 s total)
+#MSG_VIDEO_REWINDING_3
+1 s (14 s total)
+#MSG_VIDEO_REWINDING_4
+2 s (28 s total)
+#MSG_VIDEO_REWINDING_5
+5 s (1:10 mn total)
+#MSG_VIDEO_REWINDING_6
+10 s (2:20 mn total)
 #MSG_GENERAL_OFF
 Apagado
 #MSG_GENERAL_ON
@@ -1343,8 +1595,8 @@ Avanzamento rapido   %s
 Salto fotogrammi %s
 #FMT_AUDIO_SOUND
 Audio                       %s
-#FMT_AUDIO_RETRO_SOUND
-Audio retro             %s
+#FMT_VIDEO_REWINDING
+Rewinding       %s
 #FMT_SAVED_STATE_CREATE
 Crea salvataggio      %d
 #FMT_SAVED_STATE_LOAD
@@ -1361,6 +1613,10 @@ Cattura schermata...
 Tasti di scelta rapida globali...
 #MSG_TOOLS_GAME_HOTKEY_GENERAL
 Tasti di scelta rapida del gioco...
+#MSG_TOOLS_GLOBAL_BUTTON_MAPPING_GENERAL
+Global button mappings...
+#MSG_TOOLS_GAME_BUTTON_MAPPING_GENERAL
+Game-specific button mappings...
 #FMT_OPTIONS_LANGUAGE
 Lingua                               %s
 #FMT_OPTIONS_CPU_FREQUENCY
@@ -1387,6 +1643,8 @@ Informazioni sulla versione
 Salva schermata
 #MSG_SCREENSHOT_BROWSE
 Sfoglia schermate
+#MSG_HOTKEY_REWIND
+Rewind
 #MSG_HOTKEY_MAIN_MENU
 Vai al menu principale
 #MSG_HOTKEY_TEMPORARY_FAST_FORWARD
@@ -1399,8 +1657,30 @@ Carica salvataggio 1
 Crea salvataggio 1
 #MSG_HOTKEY_FULL_SCREEN_TOGGLE
 (Dis)attiva schermo intero
+#MSG_BUTTON_MAPPING_A
+GBA key *A
+#MSG_BUTTON_MAPPING_B
+GBA key *B
+#MSG_BUTTON_MAPPING_SELECT
+GBA key *s
+#MSG_BUTTON_MAPPING_START
+GBA key *S
+#MSG_BUTTON_MAPPING_R
+GBA key *R
+#MSG_BUTTON_MAPPING_L
+GBA key *L
+#MSG_BUTTON_MAPPING_RAPID_A
+Rapid-fire *A
+#MSG_BUTTON_MAPPING_RAPID_B
+Rapid-fire *B
 #MSG_PROGRESS_HOTKEY_WAITING_FOR_KEYS
 Premi il pulsante che vuoi utilizzare per questa azione.
+#MSG_PROGRESS_MAPPING_WAITING_FOR_KEY
+Press the DS button you wish to map to this GBA button.
+#MSG_PROGRESS_MAPPING_WAITING_FOR_KEY_OR_CLEAR
+Press the DS button you wish to map to this GBA button.\n
+\n
+You can press two buttons at once to delete this mapping.
 #MSG_HOTKEY_DELETE_WITH_A
 *A Elimina
 #MSG_HOTKEY_CANCEL_WITH_B
@@ -1445,6 +1725,20 @@ Nuovo gioco
 [9] Mostra 1 su 10 fotogrammi
 #MSG_VIDEO_FRAME_SKIPPING_10
 [10] Mostra 1 su 11 fotogrammi
+#MSG_VIDEO_REWINDING_0
+Disabled
+#MSG_VIDEO_REWINDING_1
+0.25 s (3.5 s total)
+#MSG_VIDEO_REWINDING_2
+0.5 s (7 s total)
+#MSG_VIDEO_REWINDING_3
+1 s (14 s total)
+#MSG_VIDEO_REWINDING_4
+2 s (28 s total)
+#MSG_VIDEO_REWINDING_5
+5 s (1:10 mn total)
+#MSG_VIDEO_REWINDING_6
+10 s (2:20 mn total)
 #MSG_GENERAL_OFF
 Disabilita
 #MSG_GENERAL_ON
@@ -1556,8 +1850,8 @@ Avanço de quadro  %s
 Pulo de quadros   %s
 #FMT_AUDIO_SOUND
 Som                       %s
-#FMT_AUDIO_RETRO_SOUND
-Som retrô             %s
+#FMT_VIDEO_REWINDING
+Rewinding       %s
 #FMT_SAVED_STATE_CREATE
 Criar estado         %d
 #FMT_SAVED_STATE_LOAD
@@ -1574,6 +1868,10 @@ Foto...
 Atalhos de tecla globais...
 #MSG_TOOLS_GAME_HOTKEY_GENERAL
 Atalhos de tecla do jogo atual...
+#MSG_TOOLS_GLOBAL_BUTTON_MAPPING_GENERAL
+Global button mappings...
+#MSG_TOOLS_GAME_BUTTON_MAPPING_GENERAL
+Game-specific button mappings...
 #FMT_OPTIONS_LANGUAGE
 Idioma                              %s
 #FMT_OPTIONS_CPU_FREQUENCY
@@ -1600,6 +1898,8 @@ Informações desta versão
 Tirar uma foto
 #MSG_SCREENSHOT_BROWSE
 Slideshow de fotos
+#MSG_HOTKEY_REWIND
+Rewind
 #MSG_HOTKEY_MAIN_MENU
 Voltar ao menu principal
 #MSG_HOTKEY_TEMPORARY_FAST_FORWARD
@@ -1612,8 +1912,30 @@ Carregar estado 1
 Criar estado 1
 #MSG_HOTKEY_FULL_SCREEN_TOGGLE
 Ativar tela-cheia
+#MSG_BUTTON_MAPPING_A
+GBA key *A
+#MSG_BUTTON_MAPPING_B
+GBA key *B
+#MSG_BUTTON_MAPPING_SELECT
+GBA key *s
+#MSG_BUTTON_MAPPING_START
+GBA key *S
+#MSG_BUTTON_MAPPING_R
+GBA key *R
+#MSG_BUTTON_MAPPING_L
+GBA key *L
+#MSG_BUTTON_MAPPING_RAPID_A
+Rapid-fire *A
+#MSG_BUTTON_MAPPING_RAPID_B
+Rapid-fire *B
 #MSG_PROGRESS_HOTKEY_WAITING_FOR_KEYS
 Aperte os botões que você deseja para realizar esta ação.
+#MSG_PROGRESS_MAPPING_WAITING_FOR_KEY
+Press the DS button you wish to map to this GBA button.
+#MSG_PROGRESS_MAPPING_WAITING_FOR_KEY_OR_CLEAR
+Press the DS button you wish to map to this GBA button.\n
+\n
+You can press two buttons at once to delete this mapping.
 #MSG_HOTKEY_DELETE_WITH_A
 *A Limpar
 #MSG_HOTKEY_CANCEL_WITH_B
@@ -1658,6 +1980,20 @@ Novo jogo
 [9] Mostrar 1 em 10 frames
 #MSG_VIDEO_FRAME_SKIPPING_10
 [10] Mostrar 1 em 11 frames
+#MSG_VIDEO_REWINDING_0
+Disabled
+#MSG_VIDEO_REWINDING_1
+0.25 s (3.5 s total)
+#MSG_VIDEO_REWINDING_2
+0.5 s (7 s total)
+#MSG_VIDEO_REWINDING_3
+1 s (14 s total)
+#MSG_VIDEO_REWINDING_4
+2 s (28 s total)
+#MSG_VIDEO_REWINDING_5
+5 s (1:10 mn total)
+#MSG_VIDEO_REWINDING_6
+10 s (2:20 mn total)
 #MSG_GENERAL_OFF
 Desligado
 #MSG_GENERAL_ON

@@ -180,9 +180,6 @@ TOUCH_SCREEN last_touch= {0, 0};
 
 #define PSP_ALL_BUTTON_MASK 0x1FFFF
 
-u32 gamepad_config_map[MAX_GAMEPAD_CONFIG_MAP];
-u32 gamepad_config_home= BUTTON_ID_X;
-
 u32 last_buttons = 0;
 //u64 button_repeat_timestamp;
 u32 button_repeat_timestamp;
@@ -285,14 +282,12 @@ u32 button_input_to_gba[] =
     BUTTON_UP,
     BUTTON_DOWN,
     BUTTON_R,
-    BUTTON_L,
-    BUTTON_ID_FA,
-    BUTTON_ID_FB,
-    BUTTON_ID_NONE
+    BUTTON_L
 };
 
 u32 rapidfire_flag = 1;
 
+u32 fast_backward= 0;
 // 仿真过程输入
 u32 update_input()
 {
@@ -305,7 +300,7 @@ u32 update_input()
     non_repeat_buttons = (last_buttons ^ buttons) & buttons;
     last_buttons = buttons;
 
-    if(non_repeat_buttons & gamepad_config_home)   //Call main menu
+    if(non_repeat_buttons & game_config.gamepad_config_map[12] /* MENU */)
     {
         u16 screen_copy[GBA_SCREEN_BUFF_SIZE];
         copy_screen(screen_copy);
@@ -314,13 +309,21 @@ u32 update_input()
         return ret_val;
     }
 
-    for(i = 0; i < 13; i++)
+	u32 HotkeyRewind = game_persistent_config.HotkeyRewind != 0 ? game_persistent_config.HotkeyRewind : gpsp_persistent_config.HotkeyRewind;
+
+	if(HotkeyRewind && (buttons & HotkeyRewind) == HotkeyRewind) // Rewind requested
     {
-        if( buttons & gamepad_config_map[i] )
-            new_key |= button_input_to_gba[i];
+		fast_backward= 1;
+		return 0;
     }
 
-    if(new_key & BUTTON_ID_FA)  //Rapid fire A
+    for(i = 0; i < 10; i++)
+    {
+        if( buttons & game_config.gamepad_config_map[i] ) // PSP/DS side
+            new_key |= button_input_to_gba[i]; // GBA side
+    }
+
+    if(game_config.gamepad_config_map[10] && buttons & game_config.gamepad_config_map[10])  //Rapid fire A
     {
         if(rapidfire_flag)
             new_key |= BUTTON_A;
@@ -330,7 +333,7 @@ u32 update_input()
         rapidfire_flag ^= 1;
     }
     
-    if(new_key & BUTTON_ID_FB) //Rapid fire B
+    if(game_config.gamepad_config_map[11] && buttons & game_config.gamepad_config_map[11]) //Rapid fire B
     {
         if(rapidfire_flag)
             new_key |= BUTTON_B;

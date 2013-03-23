@@ -74,6 +74,9 @@ vu32 vblank_count = 0;
 u32 num_skipped_frames = 0;
 u32 frames;
 
+unsigned int pen = 0;
+unsigned int frame_interval = 60; // For in-memory saved states used in rewinding
+
 int date_format= 2;
 
 u32 prescale_table[] = { 0, 6, 8, 10 };
@@ -283,7 +286,7 @@ while(1);
 
 //  init_progress(7, "");
 
-    if(gui_init(gpsp_config.language) < 0)
+    if(gui_init(0) < 0)
         quit();
   // Initial path information
   initial_gpsp_config();
@@ -528,7 +531,7 @@ u32 update_gba()
 //         {
 //              update_scanline();
 //          }
-          //if(to_skip >= SKIP_RATE)
+          if(to_skip >= SKIP_RATE)
             update_scanline();
 
           // If in visible area also fire HDMA
@@ -580,11 +583,45 @@ u32 update_gba()
           // Transition from vblank to next screen
           dispstat &= ~0x01;
           frame_ticks++;
+          	frame_ticks++;
+			if(frame_ticks >= frame_interval)
+				frame_ticks = 0;
 
 //          sceKernelDelayThread(10);
 
           if(update_input() != 0)
             continue;
+
+			if(game_config.backward)
+			{
+				if(fast_backward) // Rewinding requested
+				{
+					fast_backward = 0;
+					if(savefast_queue_len > 0)
+					{
+						if(frame_ticks > 3)
+						{
+							if(pen)
+								mdelay(500);
+
+							loadstate_fast();
+							pen = 1;
+							frame_ticks = 0;
+							continue;
+						}
+					}
+					else if(frame_ticks > 3)
+					{
+						u32 HotkeyRewind = game_persistent_config.HotkeyRewind != 0 ? game_persistent_config.HotkeyRewind : gpsp_persistent_config.HotkeyRewind;
+
+						while(readkey() & HotkeyRewind);
+					}
+				}
+				else if(frame_ticks ==0)
+				{
+					savestate_fast();
+				}
+			}
 #if 0
           if((power_flag == 1) && (into_suspend() != 0))
             continue;
@@ -611,14 +648,14 @@ u32 update_gba()
 
 //          if(!skip_next_frame_flag)
 //            flip_gba_screen();
-            //if(to_skip >= SKIP_RATE)
+            if(to_skip >= SKIP_RATE)
             {
 				//clear_gba_screen(RGB15(255, 0, 0));
                 flip_gba_screen();
                 to_skip= 0;
             }
-            //else
-            //  to_skip ++;
+            else
+              to_skip ++;
 
 //printf("SKIP_RATE %d %d\n", SKIP_RATE, to_skip);
         } //(vcount == 228)

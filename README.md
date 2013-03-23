@@ -1,4 +1,4 @@
-PokéGBA alpha version 1 (that means it may or may not work)
+PokéGBA alpha version 3 (that means it may or may not work)
 
 A Game Boy Advance emulator for the Supercard DSTWO.
 

@@ -53,8 +53,8 @@
 #define PRINT_STRING_BG(screen, str, fg_color, bg_color, x, y)                 \
   BDF_render_mix(screen, SCREEN_WIDTH, x, y, 0, bg_color, fg_color, str)					   \
 
-// #define PRINT_STRING_BG_UTF8(screen, utf8, fg_color, bg_color, x, y)           \
-//   BDF_render_mix(screen, SCREEN_WIDTH, x, y, 0, bg_color, fg_color, utf8)	   \
+#define PRINT_STRING_BG_UTF8(screen, utf8, fg_color, bg_color, x, y)           \
+   BDF_render_mix(screen, SCREEN_WIDTH, x, y, 0, bg_color, fg_color, utf8)	   \
 
 
 //colors
@@ -161,7 +161,7 @@ extern void draw_message(void* screen_address, u16 *screen_bg, u32 sx, u32 sy, u
 extern void draw_string_vcenter(void* screen_address, u32 sx, u32 sy, u32 width, 
         u32 color_fg, char *string);
 
-#define MAX_SCROLL_STRING   8
+#define MAX_SCROLL_STRING   16
 extern u32 draw_hscroll_init(void* screen_address, u32 sx, u32 sy, u32 width, 
         u32 color_bg, u32 color_fg, char *string);
 extern u32 draw_hscroll(u32 index, s32 scroll_val);

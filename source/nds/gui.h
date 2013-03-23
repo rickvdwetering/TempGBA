@@ -27,6 +27,7 @@
 
 #include "ds2io.h"
 #include "bitmap.h"
+#include "cheats.h"
 
 #define UP_SCREEN_UPDATE_METHOD   0
 #define DOWN_SCREEN_UPDATE_METHOD 2
@@ -34,6 +35,17 @@
 // For general option text
 #define OPTION_TEXT_X             10
 #define OPTION_TEXT_SX            236
+
+// For option rows
+#define GUI_ROW1_Y                36
+#define GUI_ROW_SY                19
+// The following offset is added to the row's Y coordinate to provide
+// the Y coordinate for its text.
+#define TEXT_OFFSET_Y             2
+// The following offset is added to the row's Y coordinate to provide
+// the Y coordinate for its ICON_SUBSELA (sub-screen selection type A).
+#define SUBSELA_OFFSET_Y          -2
+#define SUBSELA_X                 ((NDS_SCREEN_WIDTH - ICON_SUBSELA.x) / 2)
 
 // For message boxes
 #define MESSAGE_BOX_TEXT_X        ((NDS_SCREEN_WIDTH - ICON_MSG.x) / 2 + 3)
@@ -49,13 +61,13 @@
 
 // For the file selector
 #define FILE_SELECTOR_ICON_X      10
+#define FILE_SELECTOR_ICON_Y      (TEXT_OFFSET_Y - 1)
 #define FILE_SELECTOR_NAME_X      32
 #define FILE_SELECTOR_NAME_SX     214
 
 #define MAX_GAMEPAD_CONFIG_MAP 16
 
-
-//
+// Runtime settings for the emulator. Not persistent.
 typedef struct
 {
   u32 screen_ratio;
@@ -64,30 +76,73 @@ typedef struct
   u32 auto_help;
   u32 analog_sensitivity_level;
   u32 enable_home;
-  u32 gamepad_config_map[MAX_GAMEPAD_CONFIG_MAP];
-  u32 gamepad_config_home;
-  u32 language;
   u32 emulate_core;
   u32 debug_flag;
   u32 fake_fat;
   char rom_file[256];
   char rom_path[256];
-  char latest_file[5][512];
 } GPSP_CONFIG;
 
+// Persistent settings for the emulator.
+typedef struct
+{
+  u32 language;
+  char latest_file[5][512];
+  u32 HotkeyRewind;
+  u32 Reserved0[5];
+  /*
+   * These contain DS button bitfields, each having 1 bit set,
+   * corresponding to the 6 remappable GBA buttons and 2 specials:
+   * [0] = A          [1] = B          [2] = SELECT
+   * [3] = START      [4] = R          [5] = L
+   * [6] = Rapid A    [7] = Rapid B    (6 and 7 can be unset)
+   */
+  u32 ButtonMappings[8];
+  u32 Reserved1[114];
+} GPSP_CONFIG_FILE;
+
+// Runtime settings for the current game. Not persistent and reset between
+// games.
 typedef struct
 {
   u32 frameskip_type;
   u32 frameskip_value;
-  u32 clock_speed_number;
   u32 audio_buffer_size_number;
   u32 update_backup_flag;
-	// Disabled [Neb]
-  //CHEAT_TYPE cheats_flag[MAX_CHEATS];
+  CHEAT_TYPE cheats_flag[MAX_CHEATS];
   u32 gamepad_config_map[MAX_GAMEPAD_CONFIG_MAP];
-  u32 gamepad_config_home;
-  u32 use_default_gamepad_map;
+  u32 backward;
+  u32 backward_time;
 } GAME_CONFIG;
+
+// Persistent settings for the current game.
+typedef struct
+{
+  /*
+   * This value differs from the frameskip_type and frameskip_value in
+   * GAME_CONFIG in that this one is just one value, for the GUI, and it's
+   * split into two for the runtime settings in GAME_CONFIG.
+   */
+  u32 frameskip_value;
+  u32 clock_speed_number;
+  /*
+   * This value differs from the backward and backward_time values in
+   * GAME_CONFIG in that this one is just one value, for the GUI, and it's
+   * split into two for the runtime settings in GAME_CONFIG.
+   */
+  u32 rewind_value;
+  u32 HotkeyRewind;
+  u32 Reserved0[5];
+  /*
+   * These contain DS button bitfields, each having 1 or no bits set,
+   * corresponding to the 6 remappable GBA buttons and 2 specials:
+   * [0] = A          [1] = B          [2] = SELECT
+   * [3] = START      [4] = R          [5] = L
+   * [6] = Rapid A    [7] = Rapid B
+   */
+  u32 ButtonMappings[8];
+  u32 Reserved1[113];
+} GAME_CONFIG_FILE;
 
 struct  FILE_LIST_INFO
 {
@@ -120,6 +175,9 @@ extern char main_path[MAX_PATH];
 extern GPSP_CONFIG gpsp_config;
 extern GAME_CONFIG game_config;
 
+extern GPSP_CONFIG_FILE gpsp_persistent_config;
+extern GAME_CONFIG_FILE game_persistent_config;
+
 #define SKIP_RATE (game_config.frameskip_value)
 #define AUTO_SKIP (game_config.frameskip_type)
 /******************************************************************************
@@ -144,6 +202,10 @@ extern  void get_newest_savestate(char *name_buffer);
 void initial_gpsp_config();
 void init_game_config();
 extern void reorder_latest_file(void);
+
+extern void game_set_frameskip(void);
+extern void game_set_rewind(void);
+extern void set_button_map(void);
 
 extern void LowFrequencyCPU();
 extern void HighFrequencyCPU();
