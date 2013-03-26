@@ -35,7 +35,7 @@ u8 *g_state_buffer_ptr;
 u8 SAVEFAST_MEM[ SAVESTATE_FAST_SIZE ] __attribute__ ((aligned (4))) ;
 
 const u8 SVS_HEADER[SVS_HEADER_SIZE] = {'N', 'G', 'B', 'A', 'R', 'T', 'S', '1', '.', '0',
-  'c'};
+  'd'};
 
 typedef enum
 {
@@ -2587,8 +2587,9 @@ s32 load_gamepak(char *file_path)
     file_size = load_file_zip(file_path);
     if(file_size == -2)
     {
-      sprintf(file_path, "%s/GAMEPAK/%s", main_path, ZIP_TMP);
-      file_size = load_gamepak_raw(file_path);
+      char extracted_file[MAX_FILE];
+      sprintf(extracted_file, "%s/GAMEPAK/%s", main_path, ZIP_TMP);
+      file_size = load_gamepak_raw(extracted_file);
     }
   }
   else
@@ -3812,7 +3813,8 @@ printf("D %s\n", dot_position);
 
 /*
  * Loads a saved state, given its file name and a file handle already opened
- * in at least mode "rb" to the same file.
+ * in at least mode "rb" to the same file. This function is responsible for
+ * closing that file handle.
  * Assumes the gamepak used to save the state is the one that is currently
  * loaded.
  * Returns 0 on success, non-zero on failure.
@@ -3827,13 +3829,18 @@ u32 load_state(char *savestate_filename, FILE *fp)
     {
 	u8 header[SVS_HEADER_SIZE];
 	i = fread(header, 1, SVS_HEADER_SIZE, fp);
-	if (i < SVS_HEADER_SIZE)
+	if (i < SVS_HEADER_SIZE) {
+		fclose(fp);
 		return 1; // Failed to fully read the file
-	if (memcmp(header, SVS_HEADER, SVS_HEADER_SIZE) != 0)
+	}
+	if (memcmp(header, SVS_HEADER, SVS_HEADER_SIZE) != 0) {
+		fclose(fp);
 		return 2; // Bad saved state format
+	}
 
         i= fread(savestate_write_buffer, 1, SAVESTATE_SIZE, fp);
 printf("fread %d\n", i);
+	fclose(fp);
 	if (i < SAVESTATE_SIZE)
 		return 1; // Failed to fully read the file
 

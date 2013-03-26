@@ -68,7 +68,7 @@ char *language_options[] = { (char *) &lang[0], (char *) &lang[1], (char *) &lan
 
 #define SAVE_STATE_SLOT_NUM 16
 
-#define NDSGBA_VERSION "alpha 3"
+#define NDSGBA_VERSION "alpha 8"
 
 #define GPSP_CONFIG_FILENAME "SYSTEM/ndsgba.cfg"
 
@@ -1572,6 +1572,8 @@ s32 load_config_file()
             FILE_CLOSE(gpsp_config_file);
             return 0;
         }
+        else
+            FILE_CLOSE(gpsp_config_file);
     }
 
     return -1;
@@ -3773,7 +3775,8 @@ u32 menu(u16 *screen, int FirstInvocation)
 		get_newest_savestate(tmp_filename);
 		if(tmp_filename[0] != '\0')
 		{
-			FILE *fp = fopen(tmp_filename, "rb");
+			sprintf(line_buffer, "%s/%s", DEFAULT_SAVE_DIR, tmp_filename);
+			FILE *fp = fopen(line_buffer, "rb");
 			load_state(tmp_filename, fp);
 		}
     }
@@ -4352,6 +4355,7 @@ u32 menu(u16 *screen, int FirstInvocation)
 	return return_value;
 }
 
+#ifndef NDS_LAYER
 u32 load_dircfg(char *file_name)  // TODO: Working directory configure
 {
   int loop;
@@ -4499,6 +4503,7 @@ printf("current_str %s\n", current_str);
   fclose(msg_file);
   return -1;
 }
+#endif // !NDS_LAYER
 
 /*--------------------------------------------------------
 	Load language message
@@ -4920,7 +4925,8 @@ static void get_savestate_filelist(void)
 	char postdrix[8];
 	char *pt;
 	FILE *fp;
-	unsigned int n, m;
+	unsigned int read;
+	u8 header[SVS_HEADER_SIZE];
 	// Which is the latest?
 	/* global */ latest_save = -1;
 	struct rtc latest_save_time, current_time;
@@ -4937,15 +4943,14 @@ static void get_savestate_filelist(void)
 		if (fp != NULL)
 		{
 			SavedStateExistenceCache [i] = TRUE;
-			m = fread((void*)&n, 1, 4, fp);
-			if(m < 4) {
+			read = fread(header, 1, SVS_HEADER_SIZE, fp);
+			if(read < SVS_HEADER_SIZE || memcmp(header, SVS_HEADER, SVS_HEADER_SIZE) != 0) {
 				fclose(fp);
 				continue;
 			}
 
-			fseek(fp, n, SEEK_SET);
 			/* Read back the time stamp */
-			fread((char*)&current_time, 1, sizeof(struct rtc), fp);
+			fread(&current_time, 1, sizeof(struct rtc), fp);
 			if (rtc_time_cmp (&current_time, &latest_save_time) > 0)
 			{
 				latest_save = i;
@@ -5024,6 +5029,7 @@ void get_newest_savestate(char *name_buffer)
     get_savestate_filename(latest_save, name_buffer);
 }
 
+#ifndef NDS_LAYER
 static u32 parse_line(char *current_line, char *current_str)
 {
   char *line_ptr;
@@ -5061,6 +5067,7 @@ static u32 parse_line(char *current_line, char *current_str)
   strcpy(current_str, line_ptr);
   return 0;
 }
+#endif // !NDS_LAYER
 
 static void print_status(u32 mode)
 {
