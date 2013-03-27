@@ -65,6 +65,13 @@
 #define FILE_SELECTOR_NAME_X      32
 #define FILE_SELECTOR_NAME_SX     214
 
+// Back button
+#define BACK_BUTTON_X             229
+#define BACK_BUTTON_Y             10
+// Title icon
+#define TITLE_ICON_X              12
+#define TITLE_ICON_Y              9
+
 #define MAX_GAMEPAD_CONFIG_MAP 16
 
 // Runtime settings for the emulator. Not persistent.

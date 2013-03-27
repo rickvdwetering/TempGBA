@@ -68,7 +68,7 @@ char *language_options[] = { (char *) &lang[0], (char *) &lang[1], (char *) &lan
 
 #define SAVE_STATE_SLOT_NUM 16
 
-#define NDSGBA_VERSION "alpha 8"
+#define NDSGBA_VERSION "beta 2"
 
 #define GPSP_CONFIG_FILENAME "SYSTEM/ndsgba.cfg"
 
@@ -1016,7 +1016,7 @@ s32 load_file(char **wildcards, char *result, char *default_dir_name)
 			//draw background
 			show_icon(down_screen_addr, &ICON_SUBBG, 0, 0);
 			show_icon(down_screen_addr, &ICON_TITLE, 0, 0);
-			show_icon(down_screen_addr, &ICON_TITLEICON, 12, 9);
+			show_icon(down_screen_addr, &ICON_TITLEICON, TITLE_ICON_X, TITLE_ICON_Y);
 
 			//release data struct to draw scrolling string
 			//Path
@@ -1110,7 +1110,7 @@ s32 load_file(char **wildcards, char *result, char *default_dir_name)
 			path_scroll += 1;
 		else {
 			show_icon(down_screen_addr, &ICON_TITLE, 0, 0);
-			show_icon(down_screen_addr, &ICON_TITLEICON, 12, 9);
+			show_icon(down_screen_addr, &ICON_TITLEICON, TITLE_ICON_X, TITLE_ICON_Y);
 
 			if(path_scroll & 0x8000)	//scroll left
 			{
@@ -1582,11 +1582,11 @@ s32 load_config_file()
 void initial_gpsp_config()
 {
     //Initial directory path
-    sprintf(g_default_rom_dir, "%s/GAMEPAK", main_path);
-    sprintf(DEFAULT_SAVE_DIR, "%s/GAMERTS", main_path);
-    sprintf(DEFAULT_CFG_DIR, "%s/GAMERTS", main_path);
-    sprintf(DEFAULT_SS_DIR, "%s/GAMEPIC", main_path);
-    sprintf(DEFAULT_CHEAT_DIR, "%s/GAMECHT", main_path);
+    sprintf(g_default_rom_dir, "%s/GAMES", main_path);
+    sprintf(DEFAULT_SAVE_DIR, "%s/SAVES", main_path);
+    sprintf(DEFAULT_CFG_DIR, "%s/SAVES", main_path);
+    sprintf(DEFAULT_SS_DIR, "%s/PICS", main_path);
+    sprintf(DEFAULT_CHEAT_DIR, "%s/CHEATS", main_path);
 }
 
 /*--------------------------------------------------------
@@ -1684,8 +1684,12 @@ u32 menu(u16 *screen, int FirstInvocation)
 	auto void show_card_space();
 #endif
 	auto void savestate_selitem(u32 sel, u32 y_pos);
+	auto void game_state_menu_init();
 	auto void game_state_menu_passive();
+	auto void game_state_menu_end();
+	auto void gamestate_delette_menu_init();
 	auto void gamestate_delette_menu_passive();
+	auto void gamestate_delette_menu_end();
 	auto void cheat_menu_init();
 	auto void cheat_menu_end();
 	auto void reload_cheats_page();
@@ -1868,6 +1872,44 @@ u32 menu(u16 *screen, int FirstInvocation)
         }
     }
 
+	void game_state_menu_init()
+	{
+		if(first_load)
+		{
+			ds2_clearScreen(UP_SCREEN, 0);
+            draw_string_vcenter(up_screen_addr, 0, 88, 256, COLOR_WHITE, msg[MSG_TOP_SCREEN_NO_GAME_LOADED]);
+			ds2_flipScreen(UP_SCREEN, UP_SCREEN_UPDATE_METHOD);
+		}
+		else if(SavedStateFileExists(savestate_index))
+		{
+			get_savestate_filename(savestate_index, tmp_filename);
+			sprintf(line_buffer, "%s/%s", DEFAULT_SAVE_DIR, tmp_filename);
+			load_game_stat_snapshot(tmp_filename);
+		}
+		else
+		{
+			ds2_clearScreen(UP_SCREEN, COLOR_BLACK);
+			draw_string_vcenter(up_screen_addr, 0, 88, 256, COLOR_WHITE, msg[MSG_TOP_SCREEN_NO_SAVED_STATE_IN_SLOT]);
+			ds2_flipScreen(UP_SCREEN, UP_SCREEN_UPDATE_METHOD);
+		}
+	}
+
+	void game_state_menu_end()
+	{
+		if (!first_load)
+		{
+			ds2_clearScreen(UP_SCREEN, RGB15(0, 0, 0));
+			blit_to_screen(screen, GBA_SCREEN_WIDTH, GBA_SCREEN_HEIGHT, -1, -1);
+			ds2_flipScreen(UP_SCREEN, UP_SCREEN_UPDATE_METHOD);
+		}
+		else
+		{
+			ds2_clearScreen(UP_SCREEN, 0);
+            draw_string_vcenter(up_screen_addr, 0, 88, 256, COLOR_WHITE, msg[MSG_TOP_SCREEN_NO_GAME_LOADED]);
+			ds2_flipScreen(UP_SCREEN, UP_SCREEN_UPDATE_METHOD);
+		}
+	}
+
 	void game_state_menu_passive()
 	{
 		unsigned int line[3] = {0, 2, 4};
@@ -1875,12 +1917,12 @@ u32 menu(u16 *screen, int FirstInvocation)
 		//draw background
 		show_icon(down_screen_addr, &ICON_SUBBG, 0, 0);
 		show_icon(down_screen_addr, &ICON_TITLE, 0, 0);
-		show_icon(down_screen_addr, &ICON_TITLEICON, 12, 9);
+		show_icon(down_screen_addr, &ICON_TITLEICON, TITLE_ICON_X, TITLE_ICON_Y);
 
 		if(current_option_num == 0)
-			show_icon(down_screen_addr, &ICON_BACK, 229, 10);
+			show_icon(down_screen_addr, &ICON_BACK, BACK_BUTTON_X, BACK_BUTTON_Y);
 		else
-			show_icon(down_screen_addr, &ICON_NBACK, 229, 10);
+			show_icon(down_screen_addr, &ICON_NBACK, BACK_BUTTON_X, BACK_BUTTON_Y);
 
 		strcpy(line_buffer, *(display_option->display_string));
 		draw_string_vcenter(down_screen_addr, 0, 9, 256, COLOR_ACTIVE_ITEM, line_buffer);
@@ -1931,19 +1973,58 @@ u32 menu(u16 *screen, int FirstInvocation)
 	}
 
     u32 delette_savestate_num= 0;
+
+	void gamestate_delette_menu_init()
+	{
+		if(first_load)
+		{
+			ds2_clearScreen(UP_SCREEN, 0);
+            draw_string_vcenter(up_screen_addr, 0, 88, 256, COLOR_WHITE, msg[MSG_TOP_SCREEN_NO_GAME_LOADED]);
+			ds2_flipScreen(UP_SCREEN, UP_SCREEN_UPDATE_METHOD);
+		}
+		else if(SavedStateFileExists(delette_savestate_num))
+		{
+			get_savestate_filename(delette_savestate_num, tmp_filename);
+			sprintf(line_buffer, "%s/%s", DEFAULT_SAVE_DIR, tmp_filename);
+			load_game_stat_snapshot(tmp_filename);
+		}
+		else
+		{
+			ds2_clearScreen(UP_SCREEN, COLOR_BLACK);
+			draw_string_vcenter(up_screen_addr, 0, 88, 256, COLOR_WHITE, msg[MSG_TOP_SCREEN_NO_SAVED_STATE_IN_SLOT]);
+			ds2_flipScreen(UP_SCREEN, UP_SCREEN_UPDATE_METHOD);
+		}
+	}
+
+	void gamestate_delette_menu_end()
+	{
+		if (!first_load)
+		{
+			ds2_clearScreen(UP_SCREEN, RGB15(0, 0, 0));
+			blit_to_screen(screen, GBA_SCREEN_WIDTH, GBA_SCREEN_HEIGHT, -1, -1);
+			ds2_flipScreen(UP_SCREEN, UP_SCREEN_UPDATE_METHOD);
+		}
+		else
+		{
+			ds2_clearScreen(UP_SCREEN, 0);
+            draw_string_vcenter(up_screen_addr, 0, 88, 256, COLOR_WHITE, msg[MSG_TOP_SCREEN_NO_GAME_LOADED]);
+			ds2_flipScreen(UP_SCREEN, UP_SCREEN_UPDATE_METHOD);
+		}
+	}
+
 	void gamestate_delette_menu_passive()
 	{
-		unsigned int line[2] = {0, 1};
+		unsigned int line[2] = {0, 2};
 
 		//draw background
 		show_icon(down_screen_addr, &ICON_SUBBG, 0, 0);
 		show_icon(down_screen_addr, &ICON_TITLE, 0, 0);
-		show_icon(down_screen_addr, &ICON_TITLEICON, 12, 9);
+		show_icon(down_screen_addr, &ICON_TITLEICON, TITLE_ICON_X, TITLE_ICON_Y);
 
 		if(current_option_num == 0)
-			show_icon(down_screen_addr, &ICON_BACK, 229, 6);
+			show_icon(down_screen_addr, &ICON_BACK, BACK_BUTTON_X, BACK_BUTTON_Y);
 		else
-			show_icon(down_screen_addr, &ICON_NBACK, 229, 6);
+			show_icon(down_screen_addr, &ICON_NBACK, BACK_BUTTON_X, BACK_BUTTON_Y);
 
 		strcpy(line_buffer, *(display_option->display_string));
 		draw_string_vcenter(down_screen_addr, 0, 9, 256, COLOR_ACTIVE_ITEM, line_buffer);
@@ -1979,17 +2060,17 @@ u32 menu(u16 *screen, int FirstInvocation)
 			PRINT_STRING_BG(down_screen_addr, line_buffer, color, COLOR_TRANS, OPTION_TEXT_X, GUI_ROW1_Y + line[i] * GUI_ROW_SY + TEXT_OFFSET_Y);
         }
 
-		if(current_option_num == 2)
-			savestate_selitem(delette_savestate_num, GUI_ROW1_Y + 2 * GUI_ROW_SY + (GUI_ROW_SY - ICON_STATEFULL.y) / 2);
+		if(current_option_num == 1)
+			savestate_selitem(delette_savestate_num, GUI_ROW1_Y + 1 * GUI_ROW_SY + (GUI_ROW_SY - ICON_STATEFULL.y) / 2);
         else
-            savestate_selitem(-1, GUI_ROW1_Y + 2 * GUI_ROW_SY + (GUI_ROW_SY - ICON_STATEFULL.y) / 2);
+            savestate_selitem(-1, GUI_ROW1_Y + 1 * GUI_ROW_SY + (GUI_ROW_SY - ICON_STATEFULL.y) / 2);
 	}
 
 	void menu_save_state()
 	{
-		if(gui_action == CURSOR_SELECT)
+		if(!first_load)
 		{
-			if(!first_load)
+			if(gui_action == CURSOR_SELECT)
 			{
 				if (SavedStateFileExists (savestate_index))
 				{
@@ -2026,6 +2107,30 @@ u32 menu(u16 *screen, int FirstInvocation)
 				SavedStateCacheInvalidate ();
 
 				mdelay(500); // let the progress message linger
+
+				// Now show the screen of what we just wrote.
+				get_savestate_filename(savestate_index, tmp_filename);
+				sprintf(line_buffer, "%s/%s", DEFAULT_SAVE_DIR, tmp_filename);
+				HighFrequencyCPU();
+				load_game_stat_snapshot(tmp_filename);
+				LowFrequencyCPU();
+			}
+			else	//load screen snapshot
+			{
+				if(SavedStateFileExists(savestate_index))
+				{
+					get_savestate_filename(savestate_index, tmp_filename);
+					sprintf(line_buffer, "%s/%s", DEFAULT_SAVE_DIR, tmp_filename);
+					HighFrequencyCPU();
+					load_game_stat_snapshot(tmp_filename);
+					LowFrequencyCPU();
+				}
+				else
+				{
+					ds2_clearScreen(UP_SCREEN, COLOR_BLACK);
+					draw_string_vcenter(up_screen_addr, 0, 88, 256, COLOR_WHITE, msg[MSG_TOP_SCREEN_NO_SAVED_STATE_IN_SLOT]);
+					ds2_flipScreen(UP_SCREEN, UP_SCREEN_UPDATE_METHOD);
+				}
 			}
 		}
 	}
@@ -2109,71 +2214,91 @@ u32 menu(u16 *screen, int FirstInvocation)
 
 	void delette_savestate()
 	{
-		if(!first_load && (gui_action == CURSOR_SELECT))
+		if(!first_load)
 		{
-			if(bg_screenp != NULL)
+			if (gui_action == CURSOR_SELECT)
 			{
-				bg_screenp_color = COLOR16(43, 11, 11);
-				memcpy(bg_screenp, down_screen_addr, 256*192*2);
-			}
-			else
-				bg_screenp_color = COLOR_BG;
-
-			wait_Allkey_release(0);
-			if(current_option_num == 1)         //delette all
-			{
-				u32 i, flag;
-
-				draw_message(down_screen_addr, bg_screenp, 28, 31, 227, 165, bg_screenp_color);
-				draw_string_vcenter(down_screen_addr, MESSAGE_BOX_TEXT_X, MESSAGE_BOX_TEXT_Y, MESSAGE_BOX_TEXT_SX, COLOR_MSSG, msg[MSG_DIALOG_SAVED_STATE_DELETE_ALL]);
-
-				flag= 0;
-				for(i= 0; i < SAVE_STATE_SLOT_NUM; i++)
-					if (SavedStateFileExists (i))
-					{flag= 1; break;}
-
-				if(flag)
+				if(bg_screenp != NULL)
 				{
-					if(draw_yesno_dialog(DOWN_SCREEN, 115, msg[MSG_GENERAL_CONFIRM_WITH_A], msg[MSG_GENERAL_CANCEL_WITH_B]))
+					bg_screenp_color = COLOR16(43, 11, 11);
+					memcpy(bg_screenp, down_screen_addr, 256*192*2);
+				}
+				else
+					bg_screenp_color = COLOR_BG;
+
+				wait_Allkey_release(0);
+				if(current_option_num == 2)         //delette all
+				{
+					u32 i, flag;
+
+					draw_message(down_screen_addr, bg_screenp, 28, 31, 227, 165, bg_screenp_color);
+					draw_string_vcenter(down_screen_addr, MESSAGE_BOX_TEXT_X, MESSAGE_BOX_TEXT_Y, MESSAGE_BOX_TEXT_SX, COLOR_MSSG, msg[MSG_DIALOG_SAVED_STATE_DELETE_ALL]);
+
+					flag= 0;
+					for(i= 0; i < SAVE_STATE_SLOT_NUM; i++)
+						if (SavedStateFileExists (i))
+						{flag= 1; break;}
+
+					if(flag)
 					{
-						wait_Allkey_release(0);
-						for(i= 0; i < SAVE_STATE_SLOT_NUM; i++)
+						if(draw_yesno_dialog(DOWN_SCREEN, 115, msg[MSG_GENERAL_CONFIRM_WITH_A], msg[MSG_GENERAL_CANCEL_WITH_B]))
 						{
-							get_savestate_filename(i, tmp_filename);
-							sprintf(line_buffer, "%s/%s", DEFAULT_SAVE_DIR, tmp_filename);
-							remove(line_buffer);
-							SavedStateCacheInvalidate ();
+							wait_Allkey_release(0);
+							for(i= 0; i < SAVE_STATE_SLOT_NUM; i++)
+							{
+								get_savestate_filename(i, tmp_filename);
+								sprintf(line_buffer, "%s/%s", DEFAULT_SAVE_DIR, tmp_filename);
+								remove(line_buffer);
+								SavedStateCacheInvalidate ();
+							}
+							savestate_index= 0;
 						}
-						savestate_index= 0;
+					}
+					else
+					{
+						draw_message(down_screen_addr, bg_screenp, 28, 31, 227, 165, bg_screenp_color);
+						draw_string_vcenter(down_screen_addr, MESSAGE_BOX_TEXT_X, MESSAGE_BOX_TEXT_Y, MESSAGE_BOX_TEXT_SX, COLOR_MSSG, msg[MSG_PROGRESS_SAVED_STATE_ALREADY_EMPTY]);
+						ds2_flipScreen(DOWN_SCREEN, DOWN_SCREEN_UPDATE_METHOD);
+						mdelay(500);
 					}
 				}
-				else
+				else if(current_option_num == 1)    //delette single
 				{
 					draw_message(down_screen_addr, bg_screenp, 28, 31, 227, 165, bg_screenp_color);
-					draw_string_vcenter(down_screen_addr, MESSAGE_BOX_TEXT_X, MESSAGE_BOX_TEXT_Y, MESSAGE_BOX_TEXT_SX, COLOR_MSSG, msg[MSG_PROGRESS_SAVED_STATE_ALREADY_EMPTY]);
-					ds2_flipScreen(DOWN_SCREEN, DOWN_SCREEN_UPDATE_METHOD);
-					mdelay(500);
+
+					if(SavedStateFileExists(delette_savestate_num))
+					{
+						sprintf(line_buffer, msg[FMT_DIALOG_SAVED_STATE_DELETE_ONE], delette_savestate_num + 1);
+						draw_string_vcenter(down_screen_addr, MESSAGE_BOX_TEXT_X, MESSAGE_BOX_TEXT_Y, MESSAGE_BOX_TEXT_SX, COLOR_MSSG, line_buffer);
+
+						if(draw_yesno_dialog(DOWN_SCREEN, 115, msg[MSG_GENERAL_CONFIRM_WITH_A], msg[MSG_GENERAL_CANCEL_WITH_B])) {
+							wait_Allkey_release(0);
+							clear_savestate_slot(delette_savestate_num);
+	}
+					}
+					else
+					{
+						draw_string_vcenter(down_screen_addr, MESSAGE_BOX_TEXT_X, MESSAGE_BOX_TEXT_Y, MESSAGE_BOX_TEXT_SX, COLOR_MSSG, msg[MSG_PROGRESS_SAVED_STATE_ALREADY_EMPTY]);
+						ds2_flipScreen(DOWN_SCREEN, DOWN_SCREEN_UPDATE_METHOD);
+						mdelay(500);
+					}
 				}
 			}
-			else if(current_option_num == 2)    //delette single
+			else	//load screen snapshot
 			{
-				draw_message(down_screen_addr, bg_screenp, 28, 31, 227, 165, bg_screenp_color);
-
 				if(SavedStateFileExists(delette_savestate_num))
 				{
-					sprintf(line_buffer, msg[FMT_DIALOG_SAVED_STATE_DELETE_ONE], delette_savestate_num + 1);
-					draw_string_vcenter(down_screen_addr, MESSAGE_BOX_TEXT_X, MESSAGE_BOX_TEXT_Y, MESSAGE_BOX_TEXT_SX, COLOR_MSSG, line_buffer);
-
-					if(draw_yesno_dialog(DOWN_SCREEN, 115, msg[MSG_GENERAL_CONFIRM_WITH_A], msg[MSG_GENERAL_CANCEL_WITH_B])) {
-						wait_Allkey_release(0);
-						clear_savestate_slot(delette_savestate_num);
-}
+					get_savestate_filename(delette_savestate_num, tmp_filename);
+					sprintf(line_buffer, "%s/%s", DEFAULT_SAVE_DIR, tmp_filename);
+					HighFrequencyCPU();
+					load_game_stat_snapshot(tmp_filename);
+					LowFrequencyCPU();
 				}
 				else
 				{
-					draw_string_vcenter(down_screen_addr, MESSAGE_BOX_TEXT_X, MESSAGE_BOX_TEXT_Y, MESSAGE_BOX_TEXT_SX, COLOR_MSSG, msg[MSG_PROGRESS_SAVED_STATE_ALREADY_EMPTY]);
-					ds2_flipScreen(DOWN_SCREEN, DOWN_SCREEN_UPDATE_METHOD);
-					mdelay(500);
+					ds2_clearScreen(UP_SCREEN, COLOR_BLACK);
+					draw_string_vcenter(up_screen_addr, 0, 88, 256, COLOR_WHITE, msg[MSG_TOP_SCREEN_NO_SAVED_STATE_IN_SLOT]);
+					ds2_flipScreen(UP_SCREEN, UP_SCREEN_UPDATE_METHOD);
 				}
 			}
 		}
@@ -2440,12 +2565,12 @@ u32 menu(u16 *screen, int FirstInvocation)
 		{
 			draw_hscroll(0, dynamic_cheat_scroll_value);
 			dynamic_cheat_scroll_value = 0;
-			show_icon(down_screen_addr, &ICON_BACK, 229, 6);
+			show_icon(down_screen_addr, &ICON_BACK, BACK_BUTTON_X, BACK_BUTTON_Y);
 		}
 		else
 		{
 			draw_hscroll(0, 0);
-			show_icon(down_screen_addr, &ICON_NBACK, 229, 6);
+			show_icon(down_screen_addr, &ICON_NBACK, BACK_BUTTON_X, BACK_BUTTON_Y);
 		}
 
 		k = current_menu->num_options -1;
@@ -2751,7 +2876,7 @@ u32 menu(u16 *screen, int FirstInvocation)
 
 			ds2_clearScreen(UP_SCREEN, 0);
             draw_string_vcenter(up_screen_addr, 0, 88, 256, COLOR_WHITE, msg[MSG_TOP_SCREEN_NO_GAME_LOADED]);
-			ds2_flipScreen(UP_SCREEN, 1);
+			ds2_flipScreen(UP_SCREEN, UP_SCREEN_UPDATE_METHOD);
 
 			// mdelay(500); // Delete this delay
         }
@@ -2787,7 +2912,7 @@ u32 menu(u16 *screen, int FirstInvocation)
             {
 				ds2_clearScreen(UP_SCREEN, 0);
                 draw_string_vcenter(up_screen_addr, 0, 88, 256, COLOR_WHITE, msg[MSG_TOP_SCREEN_NO_GAME_LOADED]);
-				ds2_flipScreen(UP_SCREEN, 1);
+				ds2_flipScreen(UP_SCREEN, UP_SCREEN_UPDATE_METHOD);
             }
 
             LowFrequencyCPU(); // and back down
@@ -2869,7 +2994,7 @@ u32 menu(u16 *screen, int FirstInvocation)
 		&game_persistent_config.frameskip_value, 12 /* auto (0) and 0..10 (1..11) make 12 option values */, NULL, ACTION_TYPE, 3),
 	};
 
-	MAKE_MENU(graphics, NULL, NULL, NULL, NULL, 0, 0);
+	MAKE_MENU(graphics, NULL, NULL, NULL, NULL, 1, 1);
 
   /*--------------------------------------------------------
      Game state -- delette
@@ -2880,13 +3005,13 @@ u32 menu(u16 *screen, int FirstInvocation)
 	{
 	/* 00 */ SUBMENU_OPTION(&game_state_menu, &msg[MSG_SAVED_STATE_DELETE_GENERAL], NULL, 0),
 
-	/* 01 */ ACTION_OPTION(delette_savestate, NULL, &msg[MSG_SAVED_STATE_DELETE_ALL], NULL, 1),
+	/* 01 */ NUMERIC_SELECTION_ACTION_OPTION(delette_savestate, NULL,
+		&msg[FMT_SAVED_STATE_DELETE_ONE], &delette_savestate_num, SAVE_STATE_SLOT_NUM, NULL, 1),
 
-	/* 02 */ NUMERIC_SELECTION_ACTION_OPTION(delette_savestate, NULL,
-		&msg[FMT_SAVED_STATE_DELETE_ONE], &delette_savestate_num, SAVE_STATE_SLOT_NUM, NULL, 2)
+	/* 02 */ ACTION_OPTION(delette_savestate, NULL, &msg[MSG_SAVED_STATE_DELETE_ALL], NULL, 2)
 	};
 
-	MAKE_MENU(gamestate_delette, NULL, gamestate_delette_menu_passive, NULL, NULL, 0, 0);
+	MAKE_MENU(gamestate_delette, gamestate_delette_menu_init, gamestate_delette_menu_passive, NULL, gamestate_delette_menu_end, 1, 1);
 
   /*--------------------------------------------------------
      Game state
@@ -2905,7 +3030,7 @@ u32 menu(u16 *screen, int FirstInvocation)
 	/* 03 */ SUBMENU_OPTION(&gamestate_delette_menu, &msg[MSG_SAVED_STATE_DELETE_GENERAL], NULL, 5),
 	};
 
-	INIT_MENU(game_state, NULL, game_state_menu_passive, NULL, NULL, 0, 0);
+	INIT_MENU(game_state, game_state_menu_init, game_state_menu_passive, NULL, game_state_menu_end, 1, 1);
 
   /*--------------------------------------------------------
      Cheat options
@@ -2934,7 +3059,7 @@ u32 menu(u16 *screen, int FirstInvocation)
         NULL, 8)
 	};
 
-	INIT_MENU(cheats, cheat_menu_init, NULL, NULL, cheat_menu_end, 0, 0);
+	INIT_MENU(cheats, cheat_menu_init, NULL, NULL, cheat_menu_end, 1, 1);
 
     MENU_TYPE tools_menu;
 
@@ -2948,7 +3073,7 @@ u32 menu(u16 *screen, int FirstInvocation)
 	/* 01 */ ACTION_OPTION(set_global_hotkey_rewind, global_hotkey_rewind_passive, &msg[MSG_HOTKEY_REWIND], NULL, 1)
     };
 
-    MAKE_MENU(tools_global_hotkeys, NULL, NULL, NULL, NULL, 0, 0);
+    MAKE_MENU(tools_global_hotkeys, NULL, NULL, NULL, NULL, 1, 1);
 
   /*--------------------------------------------------------
      Tools - Game-specific hotkey overrides
@@ -2960,7 +3085,7 @@ u32 menu(u16 *screen, int FirstInvocation)
 	/* 01 */ ACTION_OPTION(set_game_specific_hotkey_rewind, game_specific_hotkey_rewind_passive, &msg[MSG_HOTKEY_REWIND], NULL, 1)
     };
 
-    MAKE_MENU(tools_game_specific_hotkeys, NULL, NULL, NULL, NULL, 0, 0);
+    MAKE_MENU(tools_game_specific_hotkeys, NULL, NULL, NULL, NULL, 1, 1);
 
   /*--------------------------------------------------------
      Tools - Global button mappings
@@ -2986,7 +3111,7 @@ u32 menu(u16 *screen, int FirstInvocation)
 	/* 08 */ ACTION_OPTION(set_global_button_rapid_b, global_button_rapid_b_passive, &msg[MSG_BUTTON_MAPPING_RAPID_B], NULL, 8)
     };
 
-    MAKE_MENU(tools_global_button_mappings, NULL, NULL, NULL, NULL, 0, 0);
+    MAKE_MENU(tools_global_button_mappings, NULL, NULL, NULL, NULL, 1, 1);
 
   /*--------------------------------------------------------
      Tools - Game-specific button mappings
@@ -3012,7 +3137,7 @@ u32 menu(u16 *screen, int FirstInvocation)
 	/* 08 */ ACTION_OPTION(set_game_specific_button_rapid_b, game_specific_button_rapid_b_passive, &msg[MSG_BUTTON_MAPPING_RAPID_B], NULL, 8)
     };
 
-    MAKE_MENU(tools_game_specific_button_mappings, NULL, NULL, NULL, NULL, 0, 0);
+    MAKE_MENU(tools_game_specific_button_mappings, NULL, NULL, NULL, NULL, 1, 1);
 
   /*--------------------------------------------------------
      Tools-screensanp
@@ -3027,7 +3152,7 @@ u32 menu(u16 *screen, int FirstInvocation)
 	/* 02 */ ACTION_OPTION(browse_screen_snapshot, NULL, &msg[MSG_SCREENSHOT_BROWSE], NULL, 2)
     };
 
-    MAKE_MENU(tools_screensnap, NULL, NULL, NULL, NULL, 0, 0);
+    MAKE_MENU(tools_screensnap, NULL, NULL, NULL, NULL, 1, 1);
 
   /*--------------------------------------------------------
      Tools
@@ -3050,7 +3175,7 @@ u32 menu(u16 *screen, int FirstInvocation)
 		&game_persistent_config.rewind_value, 7, NULL, ACTION_TYPE, 6)
     };
 
-    INIT_MENU(tools, tools_menu_init, NULL, NULL, NULL, 0, 0);
+    INIT_MENU(tools, tools_menu_init, NULL, NULL, NULL, 1, 1);
 
   /*--------------------------------------------------------
      Others
@@ -3645,13 +3770,13 @@ u32 menu(u16 *screen, int FirstInvocation)
 		//draw background
 		show_icon(down_screen_addr, &ICON_SUBBG, 0, 0);
 		show_icon(down_screen_addr, &ICON_TITLE, 0, 0);
-		show_icon(down_screen_addr, &ICON_TITLEICON, 12, 9);
+		show_icon(down_screen_addr, &ICON_TITLEICON, TITLE_ICON_X, TITLE_ICON_Y);
 
 		if(current_option_num == 0)
-			show_icon(down_screen_addr, &ICON_BACK, 229, 10);
+			show_icon(down_screen_addr, &ICON_BACK, BACK_BUTTON_X, BACK_BUTTON_Y);
 		else
 		{
-			show_icon(down_screen_addr, &ICON_NBACK, 229, 10);
+			show_icon(down_screen_addr, &ICON_NBACK, BACK_BUTTON_X, BACK_BUTTON_Y);
 			show_icon(down_screen_addr, &ICON_SUBSELA, SUBSELA_X, GUI_ROW1_Y + (current_option_num-1) * GUI_ROW_SY + SUBSELA_OFFSET_Y);
 		}
 
@@ -3847,7 +3972,7 @@ u32 menu(u16 *screen, int FirstInvocation)
 		{
 			ds2_clearScreen(UP_SCREEN, COLOR_BLACK);
 			draw_string_vcenter(up_screen_addr, 0, 88, 256, COLOR_WHITE, msg[MSG_TOP_SCREEN_NO_GAME_LOADED]);
-			ds2_flipScreen(UP_SCREEN, 1);
+			ds2_flipScreen(UP_SCREEN, UP_SCREEN_UPDATE_METHOD);
 		}
 	}
 	else
@@ -3879,7 +4004,7 @@ u32 menu(u16 *screen, int FirstInvocation)
 			//draw background
 			show_icon(down_screen_addr, &ICON_SUBBG, 0, 0);
 			show_icon(down_screen_addr, &ICON_TITLE, 0, 0);
-			show_icon(down_screen_addr, &ICON_TITLEICON, 12, 9);
+			show_icon(down_screen_addr, &ICON_TITLEICON, TITLE_ICON_X, TITLE_ICON_Y);
 
 			strcpy(line_buffer, *(display_option->display_string));
 			draw_string_vcenter(down_screen_addr, 0, 9, 256, COLOR_ACTIVE_ITEM, line_buffer);
@@ -3922,9 +4047,9 @@ u32 menu(u16 *screen, int FirstInvocation)
 				line_num = SUBMENU_ROW_NUM;
 
 			if(focus_option == 0)
-				show_icon(down_screen_addr, &ICON_BACK, 229, 10);
+				show_icon(down_screen_addr, &ICON_BACK, BACK_BUTTON_X, BACK_BUTTON_Y);
 			else
-				show_icon(down_screen_addr, &ICON_NBACK, 229, 10);
+				show_icon(down_screen_addr, &ICON_NBACK, BACK_BUTTON_X, BACK_BUTTON_Y);
 
 			for(i= 0; i < line_num; i++, display_option++)
     	    {
@@ -4341,7 +4466,11 @@ u32 menu(u16 *screen, int FirstInvocation)
 
 	ds2_clearScreen(DOWN_SCREEN, 0);
 	ds2_flipScreen(DOWN_SCREEN, DOWN_SCREEN_UPDATE_METHOD);
-	copy_screen(screen);
+	ds2_clearScreen(UP_SCREEN, RGB15(0, 0, 0));
+	blit_to_screen(screen, GBA_SCREEN_WIDTH, GBA_SCREEN_HEIGHT, -1, -1);
+	ds2_flipScreen(UP_SCREEN, UP_SCREEN_UPDATE_METHOD);
+	ds2_clearScreen(UP_SCREEN, RGB15(0, 0, 0));
+	blit_to_screen(screen, GBA_SCREEN_WIDTH, GBA_SCREEN_HEIGHT, -1, -1);
 	ds2_flipScreen(UP_SCREEN, UP_SCREEN_UPDATE_METHOD);
 	wait_Allkey_release(0);
 
@@ -4901,7 +5030,16 @@ int load_game_stat_snapshot(char* file)
 	if(NULL == fp)
 		return -1;
 
-	fseek(fp, SVS_HEADER_SIZE+sizeof(struct rtc), SEEK_SET);
+	fseek(fp, SVS_HEADER_SIZE, SEEK_SET);
+
+	struct rtc save_time;
+	char date_str[32];
+
+	fread(&save_time, 1, sizeof(save_time), fp);
+    sprintf(date_str, "%02d-%02d %02d:%02d:%02d        ",
+		save_time.month, save_time.day, save_time.hours, save_time.minutes, save_time.seconds);
+
+	PRINT_STRING_BG(up_screen_addr, date_str, COLOR_WHITE, COLOR_BLACK, 1, 1);
 
 	for (y = 0; y < 160; y++)
 	{

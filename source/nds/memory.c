@@ -35,7 +35,7 @@ u8 *g_state_buffer_ptr;
 u8 SAVEFAST_MEM[ SAVESTATE_FAST_SIZE ] __attribute__ ((aligned (4))) ;
 
 const u8 SVS_HEADER[SVS_HEADER_SIZE] = {'N', 'G', 'B', 'A', 'R', 'T', 'S', '1', '.', '0',
-  'd'};
+  'e'};
 
 typedef enum
 {
@@ -168,9 +168,8 @@ u8 iwram[1024 * 32 * 2];
 // VRAM 192kb
 u8 vram[1024 * 96 * 2];
 
-// BIOS ROM 32kb
-#include "bios_array.h"
-//u8 bios_rom[1024 * 32];
+// BIOS ROM 32kb - only the first 16 KiB are used, but 32 KiB is needed [Neb]
+u8 bios_rom[0x8000];
 
 // SRAM/flash/EEPROM 128kb
 u8 gamepak_backup[1024 * 128];
@@ -2588,7 +2587,7 @@ s32 load_gamepak(char *file_path)
     if(file_size == -2)
     {
       char extracted_file[MAX_FILE];
-      sprintf(extracted_file, "%s/GAMEPAK/%s", main_path, ZIP_TMP);
+      sprintf(extracted_file, "%s/%s", main_path, ZIP_TMP);
       file_size = load_gamepak_raw(extracted_file);
     }
   }
@@ -2660,7 +2659,6 @@ printf("file_size %d\n", file_size);
 
 // BIOS的加载
 // 返回值: MD5编码正常为0，否则 -2/-1
-#if 0
 s32 load_bios(char *name)
 {
 //  u8 md5[16];
@@ -2684,7 +2682,6 @@ printf("BIOS not opened\n");
 
   return -1;
 }
-#endif
 
 // DMA memory regions can be one of the following:
 // IWRAM - 32kb offset from the contiguous iwram region.
