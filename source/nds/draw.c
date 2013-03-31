@@ -420,7 +420,7 @@ static u32  scroll_string_num= 0;
  * Output: the scroller's handle, to be used to scroll the text in
  *   draw_hscroll.
  */
-u32 draw_hscroll_init(void* screen_addr, u32 sx, u32 sy, u32 width, 
+u32 hscroll_init(void* screen_addr, u32 sx, u32 sy, u32 width, 
         u32 color_bg, u32 color_fg, char *string)
 {
     u32 index, x, textWidth, num, len, i;
@@ -499,10 +499,17 @@ u32 draw_hscroll_init(void* screen_addr, u32 sx, u32 sy, u32 width,
         x += BDF_render16_ucs(screenp + x, textWidth, 0, color_bg, color_fg, unicode[i++]);
     }
 
-    // 5. Draw text to the screen at its initial position (left justified).
-    draw_hscroll(index, 0 /* stay on the left */);
-
     return index; // (1. Which scroller?)
+}
+
+u32 draw_hscroll_init(void* screen_addr, u32 sx, u32 sy, u32 width, 
+        u32 color_bg, u32 color_fg, char *string)
+{
+	u32 ret = hscroll_init(screen_addr, sx, sy, width, color_bg, color_fg, string);
+
+	draw_hscroll(ret, 0 /* stay on the left */);
+
+	return ret;
 }
 
 /*
@@ -1120,16 +1127,24 @@ void show_icon(void* screen, struct gui_iconlist* icon, u32 x, u32 y)
     dst = (unsigned short*)screen + y*NDS_SCREEN_WIDTH + x;
 	if(NULL == src) return;	//The icon may initialized failure
 
-    for(i= 0; i < icon->y; i++)
-    {
-		for(k= 0; k < icon->x; k++)
+	if (icon->x == NDS_SCREEN_WIDTH && icon->y == NDS_SCREEN_HEIGHT && x == 0 && y == 0)
+	{
+		// Don't support transparency for a background.
+		memcpy(dst, src, NDS_SCREEN_WIDTH * NDS_SCREEN_HEIGHT * sizeof(u16));
+	}
+	else
+	{
+		for(i= 0; i < icon->y; i++)
 		{
-			if(0x03E0 != *src) dst[k]= *src;
-			src++;
-		}
+			for(k= 0; k < icon->x; k++)
+			{
+				if(0x03E0 != *src) dst[k]= *src;
+				src++;
+			}
 
-        dst += NDS_SCREEN_WIDTH;
-    }
+			dst += NDS_SCREEN_WIDTH;
+		}
+	}
 }
 
 /*************************************************************/

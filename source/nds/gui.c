@@ -68,7 +68,7 @@ char *language_options[] = { (char *) &lang[0], (char *) &lang[1], (char *) &lan
 
 #define SAVE_STATE_SLOT_NUM 16
 
-#define NDSGBA_VERSION "beta 2"
+#define NDSGBA_VERSION "beta 6"
 
 #define GPSP_CONFIG_FILENAME "SYSTEM/ndsgba.cfg"
 
@@ -328,6 +328,7 @@ char DEFAULT_CFG_DIR[MAX_PATH];
 char DEFAULT_SS_DIR[MAX_PATH];
 char DEFAULT_CHEAT_DIR[MAX_PATH];
 u32 game_fast_forward= 0;   //OFF
+u32 temporary_fast_forward= 0;   // also off, controlled by the hotkey
 u32 SAVESTATE_SLOT = 0;
 
 
@@ -1107,7 +1108,11 @@ s32 load_file(char **wildcards, char *result, char *default_dir_name)
 		//Path auto scroll
 		unsigned int m = path_scroll & 0xFF;
 		if(m < 20) //pause 0.5sec
+		{
+			draw_hscroll(0, 0);
+			// ^ but prevent flashing with non-scrolling paths
 			path_scroll += 1;
+		}
 		else {
 			show_icon(down_screen_addr, &ICON_TITLE, 0, 0);
 			show_icon(down_screen_addr, &ICON_TITLEICON, TITLE_ICON_X, TITLE_ICON_Y);
@@ -1634,9 +1639,21 @@ u32 menu(u16 *screen, int FirstInvocation)
 	auto void tools_menu_init();
 
 	auto void set_global_hotkey_rewind();
+	auto void set_global_hotkey_return_to_menu();
+	auto void set_global_hotkey_toggle_sound();
+	auto void set_global_hotkey_fast_forward();
 	auto void set_game_specific_hotkey_rewind();
+	auto void set_game_specific_hotkey_return_to_menu();
+	auto void set_game_specific_hotkey_toggle_sound();
+	auto void set_game_specific_hotkey_fast_forward();
 	auto void global_hotkey_rewind_passive();
+	auto void global_hotkey_return_to_menu_passive();
+	auto void global_hotkey_toggle_sound_passive();
+	auto void global_hotkey_fast_forward_passive();
 	auto void game_specific_hotkey_rewind_passive();
+	auto void game_specific_hotkey_return_to_menu_passive();
+	auto void game_specific_hotkey_toggle_sound_passive();
+	auto void game_specific_hotkey_fast_forward_passive();
 
 	auto void set_global_button_a();
 	auto void set_global_button_b();
@@ -2804,46 +2821,44 @@ u32 menu(u16 *screen, int FirstInvocation)
 
     void save_screen_snapshot()
     {
-        if(gui_action == CURSOR_SELECT)
+        if(bg_screenp != NULL)
         {
-            if(bg_screenp != NULL)
-            {
-                bg_screenp_color = COLOR16(43, 11, 11);
-                memcpy(bg_screenp, down_screen_addr, 256*192*2);
-            }
-            else
-                bg_screenp_color = COLOR_BG;
+            bg_screenp_color = COLOR16(43, 11, 11);
+            memcpy(bg_screenp, down_screen_addr, 256*192*2);
+        }
+        else
+            bg_screenp_color = COLOR_BG;
 
-            draw_message(down_screen_addr, bg_screenp, 28, 31, 227, 165, bg_screenp_color);
-            if(!first_load)
-            {
-                draw_string_vcenter(down_screen_addr, MESSAGE_BOX_TEXT_X, MESSAGE_BOX_TEXT_Y, MESSAGE_BOX_TEXT_SX, COLOR_MSSG, msg[MSG_PROGRESS_SCREENSHOT_CREATING]);
-                ds2_flipScreen(DOWN_SCREEN, DOWN_SCREEN_UPDATE_METHOD);
-                if(save_ss_bmp(screen)) {
-                    draw_message(down_screen_addr, bg_screenp, 28, 31, 227, 165, bg_screenp_color);
-                    draw_string_vcenter(down_screen_addr, MESSAGE_BOX_TEXT_X, MESSAGE_BOX_TEXT_Y, MESSAGE_BOX_TEXT_SX, COLOR_MSSG, msg[MSG_PROGRESS_SCREENSHOT_CREATION_SUCCEEDED]);
-                }
-                else {
-                    draw_message(down_screen_addr, bg_screenp, 28, 31, 227, 165, bg_screenp_color);
-                    draw_string_vcenter(down_screen_addr, MESSAGE_BOX_TEXT_X, MESSAGE_BOX_TEXT_Y, MESSAGE_BOX_TEXT_SX, COLOR_MSSG, msg[MSG_PROGRESS_SCREENSHOT_CREATION_FAILED]);
-                }
-                ds2_flipScreen(DOWN_SCREEN, DOWN_SCREEN_UPDATE_METHOD);
-				mdelay(500);
+        draw_message(down_screen_addr, bg_screenp, 28, 31, 227, 165, bg_screenp_color);
+        if(!first_load)
+        {
+            draw_string_vcenter(down_screen_addr, MESSAGE_BOX_TEXT_X, MESSAGE_BOX_TEXT_Y, MESSAGE_BOX_TEXT_SX, COLOR_MSSG, msg[MSG_PROGRESS_SCREENSHOT_CREATING]);
+            ds2_flipScreen(DOWN_SCREEN, DOWN_SCREEN_UPDATE_METHOD);
+            if(save_ss_bmp(screen)) {
+                draw_message(down_screen_addr, bg_screenp, 28, 31, 227, 165, bg_screenp_color);
+                draw_string_vcenter(down_screen_addr, MESSAGE_BOX_TEXT_X, MESSAGE_BOX_TEXT_Y, MESSAGE_BOX_TEXT_SX, COLOR_MSSG, msg[MSG_PROGRESS_SCREENSHOT_CREATION_SUCCEEDED]);
             }
-            else
-            {
-                draw_string_vcenter(down_screen_addr, MESSAGE_BOX_TEXT_X, MESSAGE_BOX_TEXT_Y, MESSAGE_BOX_TEXT_SX, COLOR_MSSG, msg[MSG_TOP_SCREEN_NO_SAVED_STATE_IN_SLOT]);
-                ds2_flipScreen(DOWN_SCREEN, DOWN_SCREEN_UPDATE_METHOD);
-				mdelay(500);
+            else {
+                draw_message(down_screen_addr, bg_screenp, 28, 31, 227, 165, bg_screenp_color);
+                draw_string_vcenter(down_screen_addr, MESSAGE_BOX_TEXT_X, MESSAGE_BOX_TEXT_Y, MESSAGE_BOX_TEXT_SX, COLOR_MSSG, msg[MSG_PROGRESS_SCREENSHOT_CREATION_FAILED]);
             }
+            ds2_flipScreen(DOWN_SCREEN, DOWN_SCREEN_UPDATE_METHOD);
+			mdelay(500);
+        }
+        else
+        {
+            draw_string_vcenter(down_screen_addr, MESSAGE_BOX_TEXT_X, MESSAGE_BOX_TEXT_Y, MESSAGE_BOX_TEXT_SX, COLOR_MSSG, msg[MSG_TOP_SCREEN_NO_SAVED_STATE_IN_SLOT]);
+            ds2_flipScreen(DOWN_SCREEN, DOWN_SCREEN_UPDATE_METHOD);
+			mdelay(500);
         }
     }
 
     void browse_screen_snapshot()
     {
-        if(current_option_num == 2)
-            play_screen_snapshot();
+        play_screen_snapshot();
     }
+
+    MENU_TYPE latest_game_menu;
 
     void load_default_setting()
     {
@@ -2869,8 +2884,8 @@ u32 menu(u16 *screen, int FirstInvocation)
             remove(line_buffer);
 
             first_load= 1;
+            latest_game_menu.focus_option = latest_game_menu.screen_focus = 0;
             init_default_gpsp_config();
-            gui_action = CURSOR_RIGHT;
             language_set();
             init_game_config();
 
@@ -2897,26 +2912,25 @@ u32 menu(u16 *screen, int FirstInvocation)
         draw_string_vcenter(down_screen_addr, MESSAGE_BOX_TEXT_X, MESSAGE_BOX_TEXT_Y, MESSAGE_BOX_TEXT_SX, COLOR_MSSG, line_buffer);
         ds2_flipScreen(DOWN_SCREEN, DOWN_SCREEN_UPDATE_METHOD);
 
-		wait_Anykey_press(0);
+		wait_Allkey_release(0); // invoked from the menu
+		wait_Anykey_press(0); // wait until the user presses something
+		wait_Allkey_release(0); // don't give that button to the menu
     }
 
     void language_set()
     {
-        if(gui_action == CURSOR_LEFT || gui_action == CURSOR_RIGHT)
+        HighFrequencyCPU(); // crank it up
+
+        load_language_msg(LANGUAGE_PACK, gpsp_persistent_config.language);
+
+        if(first_load)
         {
-            HighFrequencyCPU(); // crank it up
-
-            load_language_msg(LANGUAGE_PACK, gpsp_persistent_config.language);
-
-            if(first_load)
-            {
-				ds2_clearScreen(UP_SCREEN, 0);
-                draw_string_vcenter(up_screen_addr, 0, 88, 256, COLOR_WHITE, msg[MSG_TOP_SCREEN_NO_GAME_LOADED]);
-				ds2_flipScreen(UP_SCREEN, UP_SCREEN_UPDATE_METHOD);
-            }
-
-            LowFrequencyCPU(); // and back down
+			ds2_clearScreen(UP_SCREEN, 0);
+            draw_string_vcenter(up_screen_addr, 0, 88, 256, COLOR_WHITE, msg[MSG_TOP_SCREEN_NO_GAME_LOADED]);
+			ds2_flipScreen(UP_SCREEN, UP_SCREEN_UPDATE_METHOD);
         }
+
+        LowFrequencyCPU(); // and back down
     }
 
 #ifdef ENABLE_FREE_SPACE
@@ -3070,7 +3084,13 @@ u32 menu(u16 *screen, int FirstInvocation)
     {
 	/* 00 */ SUBMENU_OPTION(&tools_menu, &msg[MSG_TOOLS_GLOBAL_HOTKEY_GENERAL], NULL, 0),
 
-	/* 01 */ ACTION_OPTION(set_global_hotkey_rewind, global_hotkey_rewind_passive, &msg[MSG_HOTKEY_REWIND], NULL, 1)
+	/* 01 */ ACTION_OPTION(set_global_hotkey_return_to_menu, global_hotkey_return_to_menu_passive, &msg[MSG_HOTKEY_MAIN_MENU], NULL, 1),
+
+	/* 02 */ ACTION_OPTION(set_global_hotkey_fast_forward, global_hotkey_fast_forward_passive, &msg[MSG_HOTKEY_TEMPORARY_FAST_FORWARD], NULL, 2),
+
+	/* 03 */ ACTION_OPTION(set_global_hotkey_rewind, global_hotkey_rewind_passive, &msg[MSG_HOTKEY_REWIND], NULL, 3),
+
+	/* 04 */ ACTION_OPTION(set_global_hotkey_toggle_sound, global_hotkey_toggle_sound_passive, &msg[MSG_HOTKEY_SOUND_TOGGLE], NULL, 4)
     };
 
     MAKE_MENU(tools_global_hotkeys, NULL, NULL, NULL, NULL, 1, 1);
@@ -3082,7 +3102,13 @@ u32 menu(u16 *screen, int FirstInvocation)
     {
 	/* 00 */ SUBMENU_OPTION(&tools_menu, &msg[MSG_TOOLS_GAME_HOTKEY_GENERAL], NULL, 0),
 
-	/* 01 */ ACTION_OPTION(set_game_specific_hotkey_rewind, game_specific_hotkey_rewind_passive, &msg[MSG_HOTKEY_REWIND], NULL, 1)
+	/* 01 */ ACTION_OPTION(set_game_specific_hotkey_return_to_menu, game_specific_hotkey_return_to_menu_passive, &msg[MSG_HOTKEY_MAIN_MENU], NULL, 1),
+
+	/* 02 */ ACTION_OPTION(set_game_specific_hotkey_fast_forward, game_specific_hotkey_fast_forward_passive, &msg[MSG_HOTKEY_TEMPORARY_FAST_FORWARD], NULL, 2),
+
+	/* 03 */ ACTION_OPTION(set_game_specific_hotkey_rewind, game_specific_hotkey_rewind_passive, &msg[MSG_HOTKEY_REWIND], NULL, 3),
+
+	/* 04 */ ACTION_OPTION(set_game_specific_hotkey_toggle_sound, game_specific_hotkey_toggle_sound_passive, &msg[MSG_HOTKEY_SOUND_TOGGLE], NULL, 4)
     };
 
     MAKE_MENU(tools_game_specific_hotkeys, NULL, NULL, NULL, NULL, 1, 1);
@@ -3219,7 +3245,6 @@ u32 menu(u16 *screen, int FirstInvocation)
   /*--------------------------------------------------------
      Load_game
   --------------------------------------------------------*/
-    MENU_TYPE latest_game_menu;
 
     MENU_OPTION_TYPE load_game_options[] =
     {
@@ -3282,7 +3307,6 @@ u32 menu(u16 *screen, int FirstInvocation)
 	void main_menu_passive()
 	{
 		show_icon(down_screen_addr, &ICON_MAINBG, 0, 0);
-		current_menu -> focus_option = current_option -> line_number;
 
 		//Audio/Video
 		strcpy(line_buffer, *(display_option->display_string));
@@ -3421,12 +3445,16 @@ u32 menu(u16 *screen, int FirstInvocation)
 
 	void tools_menu_init()
 	{
-#if 0
 		if (first_load)
+		{
 			tools_options[3] /* game hotkeys */.option_type |= HIDEN_TYPE;
+			tools_options[5] /* game button mappings */.option_type |= HIDEN_TYPE;
+		}
 		else
+		{
 			tools_options[3] /* game hotkeys */.option_type &= ~HIDEN_TYPE;
-#endif
+			tools_options[5] /* game button mappings */.option_type &= ~HIDEN_TYPE;
+		}
 	}
 
 	void obtain_hotkey (u32 *HotkeyBitfield)
@@ -3456,9 +3484,39 @@ u32 menu(u16 *screen, int FirstInvocation)
 		obtain_hotkey(&gpsp_persistent_config.HotkeyRewind);
 	}
 
+	void set_global_hotkey_return_to_menu()
+	{
+		obtain_hotkey(&gpsp_persistent_config.HotkeyReturnToMenu);
+	}
+
+	void set_global_hotkey_toggle_sound()
+	{
+		obtain_hotkey(&gpsp_persistent_config.HotkeyToggleSound);
+	}
+
+	void set_global_hotkey_fast_forward()
+	{
+		obtain_hotkey(&gpsp_persistent_config.HotkeyTemporaryFastForward);
+	}
+
 	void set_game_specific_hotkey_rewind()
 	{
 		obtain_hotkey(&game_persistent_config.HotkeyRewind);
+	}
+
+	void set_game_specific_hotkey_return_to_menu()
+	{
+		obtain_hotkey(&game_persistent_config.HotkeyReturnToMenu);
+	}
+
+	void set_game_specific_hotkey_toggle_sound()
+	{
+		obtain_hotkey(&game_persistent_config.HotkeyToggleSound);
+	}
+
+	void set_game_specific_hotkey_fast_forward()
+	{
+		obtain_hotkey(&game_persistent_config.HotkeyTemporaryFastForward);
 	}
 
 #define HOTKEY_CONTENT_X 156
@@ -3500,9 +3558,39 @@ u32 menu(u16 *screen, int FirstInvocation)
 		hotkey_option_passive_common(gpsp_persistent_config.HotkeyRewind);
 	}
 
+	void global_hotkey_return_to_menu_passive()
+	{
+		hotkey_option_passive_common(gpsp_persistent_config.HotkeyReturnToMenu);
+	}
+
+	void global_hotkey_toggle_sound_passive()
+	{
+		hotkey_option_passive_common(gpsp_persistent_config.HotkeyToggleSound);
+	}
+
+	void global_hotkey_fast_forward_passive()
+	{
+		hotkey_option_passive_common(gpsp_persistent_config.HotkeyTemporaryFastForward);
+	}
+
 	void game_specific_hotkey_rewind_passive()
 	{
 		hotkey_option_passive_common(game_persistent_config.HotkeyRewind);
+	}
+
+	void game_specific_hotkey_return_to_menu_passive()
+	{
+		hotkey_option_passive_common(game_persistent_config.HotkeyReturnToMenu);
+	}
+
+	void game_specific_hotkey_toggle_sound_passive()
+	{
+		hotkey_option_passive_common(game_persistent_config.HotkeyToggleSound);
+	}
+
+	void game_specific_hotkey_fast_forward_passive()
+	{
+		hotkey_option_passive_common(game_persistent_config.HotkeyTemporaryFastForward);
 	}
 
 	void obtain_key (u32 *KeyBitfield)
@@ -3741,8 +3829,8 @@ u32 menu(u16 *screen, int FirstInvocation)
         {
             ext_pos= strrchr(gpsp_persistent_config.latest_file[k], '/');
             if(ext_pos != NULL)
-                draw_hscroll_init(down_screen_addr, OPTION_TEXT_X, GUI_ROW1_Y + k * GUI_ROW_SY + TEXT_OFFSET_Y, OPTION_TEXT_SX,
-                    COLOR_TRANS, COLOR_INACTIVE_ITEM, ext_pos+1);
+                hscroll_init(down_screen_addr, OPTION_TEXT_X, GUI_ROW1_Y + k * GUI_ROW_SY + TEXT_OFFSET_Y, OPTION_TEXT_SX,
+                    COLOR_TRANS, k + 1 == latest_game_menu.focus_option ? COLOR_ACTIVE_ITEM : COLOR_INACTIVE_ITEM, ext_pos+1);
 			else
 				break;
         }
@@ -3819,7 +3907,7 @@ u32 menu(u16 *screen, int FirstInvocation)
 				{
 					draw_hscroll_over(current_option_num-1);
 	            	ext_pos= strrchr(gpsp_persistent_config.latest_file[current_option_num-1], '/');
-                	draw_hscroll_init(down_screen_addr, OPTION_TEXT_X, GUI_ROW1_Y + (current_option_num-1) * GUI_ROW_SY + TEXT_OFFSET_Y, OPTION_TEXT_SX,
+                	hscroll_init(down_screen_addr, OPTION_TEXT_X, GUI_ROW1_Y + (current_option_num-1) * GUI_ROW_SY + TEXT_OFFSET_Y, OPTION_TEXT_SX,
                 	    COLOR_TRANS, COLOR_INACTIVE_ITEM, ext_pos+1);
 				}
 
@@ -3833,7 +3921,7 @@ u32 menu(u16 *screen, int FirstInvocation)
 				{
 					draw_hscroll_over(current_option_num-1);
 	            	ext_pos= strrchr(gpsp_persistent_config.latest_file[current_option_num-1], '/');
-                	draw_hscroll_init(down_screen_addr, OPTION_TEXT_X, GUI_ROW1_Y + (current_option_num-1) * GUI_ROW_SY + TEXT_OFFSET_Y, OPTION_TEXT_SX,
+                	hscroll_init(down_screen_addr, OPTION_TEXT_X, GUI_ROW1_Y + (current_option_num-1) * GUI_ROW_SY + TEXT_OFFSET_Y, OPTION_TEXT_SX,
                 	    COLOR_TRANS, COLOR_ACTIVE_ITEM, ext_pos+1);
 				}
 
@@ -3845,7 +3933,7 @@ u32 menu(u16 *screen, int FirstInvocation)
 				{
 					draw_hscroll_over(current_option_num-1);
 	            	ext_pos= strrchr(gpsp_persistent_config.latest_file[current_option_num-1], '/');
-                	draw_hscroll_init(down_screen_addr, OPTION_TEXT_X, GUI_ROW1_Y + (current_option_num-1) * GUI_ROW_SY + TEXT_OFFSET_Y, OPTION_TEXT_SX,
+                	hscroll_init(down_screen_addr, OPTION_TEXT_X, GUI_ROW1_Y + (current_option_num-1) * GUI_ROW_SY + TEXT_OFFSET_Y, OPTION_TEXT_SX,
                 	    COLOR_TRANS, COLOR_INACTIVE_ITEM, ext_pos+1);
 				}
 
@@ -3858,7 +3946,7 @@ u32 menu(u16 *screen, int FirstInvocation)
 				{
 					draw_hscroll_over(current_option_num-1);
 	            	ext_pos= strrchr(gpsp_persistent_config.latest_file[current_option_num-1], '/');
-                	draw_hscroll_init(down_screen_addr, OPTION_TEXT_X, GUI_ROW1_Y + (current_option_num-1) * GUI_ROW_SY + TEXT_OFFSET_Y, OPTION_TEXT_SX,
+                	hscroll_init(down_screen_addr, OPTION_TEXT_X, GUI_ROW1_Y + (current_option_num-1) * GUI_ROW_SY + TEXT_OFFSET_Y, OPTION_TEXT_SX,
                 	    COLOR_TRANS, COLOR_ACTIVE_ITEM, ext_pos+1);
 				}
 
@@ -3937,6 +4025,7 @@ u32 menu(u16 *screen, int FirstInvocation)
 			if(current_menu->end_function)
 				current_menu->end_function();
 			SaveConfigsIfNeeded();
+			current_menu->focus_option = current_menu->screen_focus = current_option_num;
 		}
 
 		current_menu = new_menu;
@@ -4090,6 +4179,9 @@ u32 menu(u16 *screen, int FirstInvocation)
     	    }
     	}
 
+	mdelay(20); // to prevent the DSTwo-DS link from being too clogged
+	            // to return button statuses
+
 		struct key_buf inputdata;
 		gui_action = get_gui_input();
 
@@ -4099,7 +4191,7 @@ u32 menu(u16 *screen, int FirstInvocation)
 				ds2_getrawInput(&inputdata);
 				wait_Allkey_release(0);
 				/* Back button at the top of every menu but the main one */
-				if(current_menu != &main_menu && inputdata.x > 231 && inputdata.y <= 25)
+				if(current_menu != &main_menu && inputdata.x >= BACK_BUTTON_X && inputdata.y < BACK_BUTTON_Y + ICON_BACK.y)
 				{
 					choose_menu(current_menu->options->sub_menu);
 					break;
@@ -4123,13 +4215,9 @@ u32 menu(u16 *screen, int FirstInvocation)
 					else if(current_option->option_type & SUBMENU_TYPE)
 						choose_menu(current_option->sub_menu);
 				}
-				/* This is the majority case, covering all menus except save states, screen shots, and game loading */
+				/* This is the majority case, covering all menus except save states (and deletion thereof) */
 				else if(current_menu != (main_menu.options + 1)->sub_menu
-				&& current_menu != ((main_menu.options +1)->sub_menu->options + 3)->sub_menu
-				&& current_menu != (main_menu.options +3)->sub_menu
-				&& current_menu != ((main_menu.options +3)->sub_menu->options + 1)->sub_menu
-				&& current_menu != (main_menu.options +6)->sub_menu
-				&& current_menu != ((main_menu.options +6)->sub_menu->options + 2)->sub_menu)
+				&& current_menu != ((main_menu.options +1)->sub_menu->options + 3)->sub_menu)
 				{
 					if (inputdata.y <= GUI_ROW1_Y || inputdata.y > 192)
 						break;
@@ -4152,12 +4240,7 @@ u32 menu(u16 *screen, int FirstInvocation)
 					current_option_num = next_option_num;
 					current_option = current_menu->options + current_option_num;
 
-					if(current_menu->key_function)
-					{
-						gui_action = CURSOR_RIGHT;
-						current_menu->key_function();
-					}
-					else if(current_option->option_type & (NUMBER_SELECTION_TYPE | STRING_SELECTION_TYPE))
+					if(current_option->option_type & (NUMBER_SELECTION_TYPE | STRING_SELECTION_TYPE))
 					{
 						gui_action = CURSOR_RIGHT;
 						u32 current_option_val = *(current_option->current_option);
@@ -4173,6 +4256,11 @@ u32 menu(u16 *screen, int FirstInvocation)
 					}
 					else if(current_option->option_type & ACTION_TYPE)
 						current_option->action_function();
+					else if(current_menu->key_function)
+					{
+						gui_action = CURSOR_RIGHT;
+						current_menu->key_function();
+					}
 					else if(current_option->option_type & SUBMENU_TYPE)
 						choose_menu(current_option->sub_menu);
 				}
@@ -4258,12 +4346,10 @@ u32 menu(u16 *screen, int FirstInvocation)
 				else if(current_menu == ((main_menu.options + 1)->sub_menu->options + 3)->sub_menu)
 				{
 					u32 next_option_num;
-					if(inputdata.y <= GUI_ROW1_Y)
+					if(inputdata.y <= GUI_ROW1_Y + 1 * GUI_ROW_SY)
 						break;
-					else if(inputdata.y <= GUI_ROW1_Y + 1 * GUI_ROW_SY)
-						next_option_num = 1;
 					else if(inputdata.y <= GUI_ROW1_Y + 2 * GUI_ROW_SY)
-						break;
+						next_option_num = 1;
 					else if(inputdata.y <= GUI_ROW1_Y + 3 * GUI_ROW_SY)
 						next_option_num = 2;
 					else
@@ -4271,7 +4357,7 @@ u32 menu(u16 *screen, int FirstInvocation)
 
 					struct _MENU_OPTION_TYPE *next_option = current_menu->options + next_option_num;
 
-					if(next_option_num == 2)
+					if(next_option_num == 1)
 					{
 						u32 current_option_val = *(next_option->current_option);
 						u32 old_option_val = current_option_val;
@@ -4310,35 +4396,6 @@ u32 menu(u16 *screen, int FirstInvocation)
 					}
 
 					gui_action = CURSOR_SELECT;
-					if(next_option -> option_type & HIDEN_TYPE)
-						break;
-
-					current_option_num = next_option_num;
-					current_option = next_option;
-
-					if(current_option->option_type & ACTION_TYPE)
-						current_option->action_function();
-					else if(current_option->option_type & SUBMENU_TYPE)
-						choose_menu(current_option->sub_menu);
-				}
-				/* Screenshots and new game loading */
-				else if(current_menu == (main_menu.options + 3)->sub_menu
-				|| current_menu == ((main_menu.options +3)->sub_menu->options + 1)->sub_menu
-				|| current_menu == (main_menu.options + 6)->sub_menu
-				|| current_menu == ((main_menu.options +6)->sub_menu->options + 2)->sub_menu)
-				{
-					if (inputdata.y <= GUI_ROW1_Y || inputdata.y > 192)
-						break;
-					// ___ 33        This screen has 6 possible rows. Touches
-					// ___ 60        above or below these are ignored.
-					// . . . (+27)   The row between 33 and 60 is [1], though!
-					// ___ 192
-					u32 next_option_num = (inputdata.y - GUI_ROW1_Y) / GUI_ROW_SY + 1;
-					if (next_option_num > current_menu->num_options)
-						break;
-
-					struct _MENU_OPTION_TYPE *next_option = current_menu->options + next_option_num;
-
 					if(next_option -> option_type & HIDEN_TYPE)
 						break;
 
@@ -5371,7 +5428,7 @@ static u32 save_ss_bmp(u16 *image)
 void game_disableAudio() {/* Nothing. sound_on applies immediately. */}
 void game_set_frameskip() {
 	// If fast-forward is active, force frameskipping to be 9.
-	if (game_fast_forward) {
+	if (game_fast_forward || temporary_fast_forward) {
 		AUTO_SKIP = 0;
 		SKIP_RATE = 9;
 	}
