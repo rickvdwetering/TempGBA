@@ -1,4 +1,4 @@
-TempGBA beta version 6, 2013-03-30
+PokéGBA beta version 6, 2013-03-30
 
 A Game Boy Advance emulator for the Supercard DSTWO.
 
@@ -13,13 +13,13 @@ Based on:
 (If you got the source code and want to compile it, see the `Compiling` section
  at the end of the file.)
 
-To install the plugin to your storage card, copy `tempgba.plg`, `tempgba.ini`
-and `tempgba.bmp` from the release archive to the card's `_dstwoplug`
-directory. Then, copy the `TEMPGBA` subdirectory to the root of the card.
+To install the plugin to your storage card, copy `pokegba.plg`, `pokegba.ini`
+and `pokegba.bmp` from the release archive to the card's `_dstwoplug`
+directory. Then, copy the `POKEGBA` subdirectory to the root of the card.
 
 ## The GBA BIOS
 
-To function properly, TempGBA needs a dump of the GBA's BIOS. It is **not**
+To function properly, PokéGBA needs a dump of the GBA's BIOS. It is **not**
 distributed in the release archive because of legal issues. Do not ask the
 author where to find this file; any questions regarding the BIOS will be
 quickly ignored. You, the user, are responsible for your use of the BIOS.
@@ -31,20 +31,20 @@ checksums:
 * SHA-1: `300c20df6731a33952ded8c436f7f186d25d3492`.
 
 Once dumped or found, name the file `gba_bios.bin`, and place it in the
-`TEMPGBA` directory of your storage card. So the path should look like this:
-`/media/Your-Card/TEMPGBA/gba_bios.bin` on Linux; `E:\TempGBA\gba_bios.bin`
+`POKEGBA` directory of your storage card. So the path should look like this:
+`/media/Your-Card/POKEGBA/gba_bios.bin` on Linux; `E:\POKEGBA\gba_bios.bin`
 on Windows.
 
 # Improving game compatibility with game_config.txt
 
 Included with this release is a file called game_config.txt. The file is the
-same as the one included in gpSP Kai. It goes in the `TEMPGBA` directory on
+same as the one included in gpSP Kai. It goes in the `POKEGBA` directory on
 your storage card when you extract the release.
 
 This file contains information to enhance game compatibility in two ways.
-* Firstly, it tells TempGBA about the save type used by a certain game, so that
+* Firstly, it tells PokéGBA about the save type used by a certain game, so that
   battery-backed saves may be read and written correctly.
-* Secondly, it tells TempGBA about idle loops in a certain game, so that it may
+* Secondly, it tells PokéGBA about idle loops in a certain game, so that it may
   stop emulating when the game reaches them. It runs the game faster.
 
 game_config.txt receives updates from the community occasionally.
@@ -53,7 +53,7 @@ For the latest version, see:
 
 # Cheats
 
-The cheat support in TempGBA is untested, but should be equivalent to that of
+The cheat support in PokéGBA is untested, but should be equivalent to that of
 the official NDSGBA, version 1.21.
 
 # Rewinding
@@ -176,12 +176,12 @@ Here's what each DS button would do in this example:
 
 # The font
 
-The font used by TempGBA is similar to the Pictochat font. To modify it,
+The font used by PokéGBA is similar to the Pictochat font. To modify it,
 see `source/font/README.txt`.
 
 # Translations
 
-Translations for TempGBA may be submitted to the author(s) under many forms,
+Translations for PokéGBA may be submitted to the author(s) under many forms,
 one of which is the Github pull request. To complete a translation, you will
 need to do the following:
 
@@ -193,7 +193,7 @@ need to do the following:
 * Translate each of the messages, using the lines starting with `#MSG_` as a
   guide to the context in which the messages will be used.
 
-If you are not comfortable editing C code, or cannot compile TempGBA after
+If you are not comfortable editing C code, or cannot compile PokéGBA after
 changes, you may instead test your translation in the English block and submit
 it. That allows you to look for message length issues and to align the option
 names and values to your liking with spaces.
@@ -233,15 +233,15 @@ to do the following:
   ```
 
 Compile again, copy the plugin and your new `language.msg` to your card
-under `TEMPGBA/system`, and you can now select your new language in TempGBA!
+under `POKEGBA/system`, and you can now select your new language in PokéGBA!
 
 # Compiling
 
-Compiling TempGBA is best done on Linux. Make sure you have access to a Linux
+Compiling PokéGBA is best done on Linux. Make sure you have access to a Linux
 system to perform these steps.
 
 ## The DS2 SDK
-To compile TempGBA, you need to have the Supercard team's DS2 SDK.
+To compile PokéGBA, you need to have the Supercard team's DS2 SDK.
 The Makefile expects it at `/opt/ds2sdk`, but you can move it anywhere,
 provided that you update the Makefile's `DS2SDKPATH` variable to point to it.
 
@@ -269,6 +269,6 @@ anywhere, provided that you update the Makefile's `CROSS` variable to point to
 it.
 
 ## Making the plugin
-To make the plugin, `tempgba.plg`, use the `cd` command to change to the
-directory containing your copy of the TempGBA source, then type
-`make clean; make`. `tempgba.plg` should appear in the same directory.
+To make the plugin, `pokegba.plg`, use the `cd` command to change to the
+directory containing your copy of the PokéGBA source, then type
+`make clean; make`. `pokegba.plg` should appear in the same directory.
