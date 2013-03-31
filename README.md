@@ -13,7 +13,7 @@ Based on:
 (If you got the source code and want to compile it, see the `Compiling` section
  at the end of the file.)
 
-To install the plugin to your storage card, copy `pokegba.plg`, `tempgba.ini`
+To install the plugin to your storage card, copy `tempgba.plg`, `tempgba.ini`
 and `tempgba.bmp` from the release archive to the card's `_dstwoplug`
 directory. Then, copy the `TEMPGBA` subdirectory to the root of the card.
 
@@ -109,9 +109,13 @@ to L, R, X and Y to the game.
 Available actions are:
 * Go to main menu. In addition to tapping the Touch Screen to return to
   the main menu, you can set a hotkey to do the same.
+* Temporary fast-forward. While this hotkey is held, the fast-forward option
+  will be forced on.
 * Rewind. A hotkey needs to be set here if you want to use the rewind feature
   in a game. After each second the hotkey is held, the game will rewind one
   step. See the `Rewinding` section above for more information.
+* Toggle sound. Each time this hotkey is held, the sound will be disabled if
+  it's currently enabled, and vice-versa.
 
 # Button mapping
 
