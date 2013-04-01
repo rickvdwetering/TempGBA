@@ -5539,7 +5539,7 @@ int gui_init(u32 lang_id)
 
 	HighFrequencyCPU(); // Crank it up. When the menu starts, -> 0.
 
-    //Find the "POKEGBA" system directory
+    //Find the "TEMPGBA" system directory
     DIR *current_dir;
 
     if(CheckLoad_Arg()){
@@ -5557,12 +5557,12 @@ int gui_init(u32 lang_id)
       DIR *testDir = opendir(tempPath);
       if(!testDir)
         //not a valid PokéGBA install
-        strcpy(main_path, "fat:/POKEGBA");
+        strcpy(main_path, "fat:/TEMPGBA");
       else//test was successful, do nothing
         closedir(testDir);
     }
     else
-      strcpy(main_path, "fat:/POKEGBA");
+      strcpy(main_path, "fat:/TEMPGBA");
 
 
 
@@ -5571,14 +5571,14 @@ int gui_init(u32 lang_id)
         closedir(current_dir);
     else
     {
-        strcpy(main_path, "fat:/_SYSTEM/PLUGINS/POKEGBA");
+        strcpy(main_path, "fat:/_SYSTEM/PLUGINS/TEMPGBA");
         current_dir = opendir(main_path);
         if(current_dir)
             closedir(current_dir);
         else
         {
             strcpy(main_path, "fat:");
-            if(search_dir("POKEGBA", main_path) == 0)
+            if(search_dir("TEMPGBA", main_path) == 0)
             {
                 printf("Found TEMPGBA directory\nDossier TEMPGBA trouve\n\n%s\n", main_path);
             }

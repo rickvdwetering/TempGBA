@@ -21,8 +21,8 @@ START_ASM   := $(DS2SDKPATH)/specs/start.S
 START_O     := start.o
 
 # - - - Names - - -
-OUTPUT      := pokegba
-PLUGIN_DIR  := POKEGBA
+OUTPUT      := tempgba
+PLUGIN_DIR  := TEMPGBA
 
 # - - - Tools - - -
 CC           = $(CROSS)gcc
@@ -99,8 +99,6 @@ $(START_O): $(START_ASM)
 	$(CC) $(CFLAGS) $(INCLUDE) -o $@ -c $<
 
 makedirs:
-	-rm -rf $(PLUGIN_DIR)
-	-cp -r TEMPGBA $(PLUGIN_DIR)
 	-mkdir $(PLUGIN_DIR)/GAMES
 	-mkdir $(PLUGIN_DIR)/CHEATS
 	-mkdir $(PLUGIN_DIR)/SAVES
