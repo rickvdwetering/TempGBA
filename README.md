@@ -1,4 +1,4 @@
-PokéGBA beta version 6, 2013-03-30
+PokéGBA beta version 7, 2013-04-01
 
 A Game Boy Advance emulator for the Supercard DSTWO.
 
